@@ -1,49 +1,120 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Educare — Nền tảng học tập cho học sinh tiểu học: Toán, Tiếng Việt, Tiếng Anh" />
   <title>Educare – Toán, Tiếng Việt, Tiếng Anh lớp 1–5</title>
+  <style>
+    :root{
+      --bg:#fff7ed; /* warm background */
+      --card:#ffffff;
+      --text:#1f2937;
+      --accent-1:#ff7ab6; /* pink */
+      --accent-2:#7ad3ff; /* sky */
+      --accent-3:#ffd166; /* yellow */
+      --accent-4:#8be76a; /* green */
+      --accent-5:#a78bfa; /* purple */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
+      display:flex;align-items:center;justify-content:center;padding:2rem;
+    }
+    .container{width:100%;max-width:980px;background:var(--card);padding:1.25rem;border-radius:18px;box-shadow:0 10px 30px rgba(15,23,42,0.08)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent-2),var(--accent-1));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:28px}
+    h1{margin:.2rem 0;font-size:1.6rem}
+    .tagline{color:#334155}
+    nav a{margin-left:0.75rem;color:var(--text);text-decoration:none;font-weight:700}
+
+    .intro{margin-top:0.75rem}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
+    .subject{padding:0.8rem;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.3));box-shadow:0 6px 18px rgba(2,6,23,0.06);text-align:center}
+    .subject h2{margin:0 0 .5rem;font-size:1.05rem}
+    .levels{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 1rem;border-radius:12px;font-weight:800;color:white;border:none;cursor:pointer;font-size:1rem;min-width:88px;min-height:56px;box-shadow:0 6px 12px rgba(15,23,42,0.08);
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn--pink{background:var(--accent-1)}
+    .btn--sky{background:var(--accent-2);color:#06283d}
+    .btn--yellow{background:var(--accent-3);color:#2b2b2b}
+    .btn--green{background:var(--accent-4);color:#0b3b10}
+    .btn--purple{background:var(--accent-5)}
+
+    .subject p{margin:.5rem 0 0;color:#475569}
+    footer{margin-top:1rem;text-align:center;color:#475569}
+
+    @media (max-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:520px){.grid{grid-template-columns:1fr}.btn{min-width:120px;width:48%;padding:.75rem;font-size:.95rem}}
+  </style>
 </head>
 <body>
+  <main class="container" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">E</div>
+        <div>
+          <h1>Educare</h1>
+          <div class="tagline">Học vui — Học chắc cho học sinh tiểu học</div>
+        </div>
+      </div>
+      <nav aria-label="Chuyển hướng">
+        <a href="#toan">Toán</a>
+        <a href="#tv">Tiếng Việt</a>
+        <a href="#ta">Tiếng Anh</a>
+      </nav>
+    </header>
 
-<h1>Educare</h1>
+    <section class="intro">
+      <p style="font-weight:700">Chọn môn và cấp học bằng các nút bên dưới. Các nút lớn, màu sắc dễ nhận biết — phù hợp cho trẻ em.</p>
+    </section>
 
-<p>
-Nền tảng chia sẻ kiến thức học tập dành cho học sinh tiểu học,
-tập trung vào Toán tư duy, Tiếng Việt và Tiếng Anh
-từ lớp 1 đến lớp 5.
-</p>
+    <section id="toan" class="grid" aria-labelledby="toan-title">
+      <div class="subject">
+        <h2 id="toan-title">📘 Toán tư duy</h2>
+        <p>Vui, logic, phát triển tư duy</p>
+        <div class="levels" style="margin-top:.6rem">
+          <a class="btn btn--pink" href="/toan/lop1.html">Lớp 1</a>
+          <a class="btn btn--sky" href="/toan/lop2.html">Lớp 2</a>
+          <a class="btn btn--yellow" href="/toan/lop3.html">Lớp 3</a>
+          <a class="btn btn--green" href="/toan/lop4.html">Lớp 4</a>
+          <a class="btn btn--purple" href="/toan/lop5.html">Lớp 5</a>
+        </div>
+      </div>
 
-<h2>📘 Toán tư duy</h2>
-<ul>
-  <li>Lớp 1</li>
-  <li>Lớp 2</li>
-  <li>Lớp 3</li>
-  <li>Lớp 4</li>
-  <li>Lớp 5</li>
-</ul>
+      <div class="subject" id="tv">
+        <h2 id="tv-title">✍️ Tiếng Việt</h2>
+        <p>Rèn chữ, đọc hiểu, làm văn cơ bản</p>
+        <div class="levels" style="margin-top:.6rem">
+          <a class="btn btn--pink" href="/tv/lop1.html">Lớp 1</a>
+          <a class="btn btn--sky" href="/tv/lop2.html">Lớp 2</a>
+          <a class="btn btn--yellow" href="/tv/lop3.html">Lớp 1</a>
+          <a class="btn btn--green" href="/tv/lop4.html">Lớp 4</a>
+          <a class="btn btn--purple" href="/tv/lop5.html">Lớp 5</a>
+        </div>
+      </div>
 
-<h2>✍️ Tiếng Việt</h2>
-<ul>
-  <li>Lớp 1</li>
-  <li>Lớp 2</li>
-  <li>Lớp 3</li>
-  <li>Lớp 4</li>
-  <li>Lớp 5</li>
-</ul>
+      <div class="subject" id="ta">
+        <h2 id="ta-title">🌍 Tiếng Anh</h2>
+        <p>Giao tiếp cơ bản, từ vựng, trò chơi</p>
+        <div class="levels" style="margin-top:.6rem">
+          <a class="btn btn--pink" href="/ta/lop1.html">Lớp 1</a>
+          <a class="btn btn--sky" href="/ta/lop2.html">Lớp 2</a>
+          <a class="btn btn--yellow" href="/ta/lop3.html">Lớp 3</a>
+          <a class="btn btn--green" href="/ta/lop4.html">Lớp 4</a>
+          <a class="btn btn--purple" href="/ta/lop5.html">Lớp 5</a>
+        </div>
+      </div>
+    </section>
 
-<h2>🌍 Tiếng Anh</h2>
-<ul>
-  <li>Lớp 1</li>
-  <li>Lớp 2</li>
-  <li>Lớp 3</li>
-  <li>Lớp 4</li>
-  <li>Lớp 5</li>
-</ul>
-
-<p>
-EducareHG1993 – Học chắc nền tảng, phát triển tư duy.
-</p>
-
+    <footer>
+      © EducareHG1993 — Liên hệ: <a href="mailto:youremail@example.com">youremail@example.com</a>
+    </footer>
+  </main>
 </body>
 </html>
