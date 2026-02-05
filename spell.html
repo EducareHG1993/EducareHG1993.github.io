@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>CO QUYNH PHONICS SPELL</title>
+    <style>
+        :root { --primary: #4338ca; --secondary: #f43f5e; --accent: #fbbf24; --bg: #f8fafc; }
+        body { font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        #app-container { background: white; width: 100%; max-width: 720px; padding: 30px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 15px solid var(--primary); border-bottom: 15px solid var(--primary); }
+        
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { color: var(--primary); font-size: 2.2em; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .setup-box, .study-box { text-align: center; }
+        input, select { width: 90%; padding: 15px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 15px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(67, 56, 202, 0.2); }
+
+        .sound-hub { background: #f1f5f9; padding: 15px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .sound-btn { padding: 10px 15px; font-size: 1.1em; font-weight: bold; color: var(--primary); background: white; border: 2px solid #cbd5e1; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .sound-btn:hover { background: var(--primary); color: white; }
+
+        .challenge-zone { background: #ffffff; padding: 25px; border-radius: 20px; border: 4px dashed #e2e8f0; margin-bottom: 20px; position: relative; }
+        .hint-text { font-size: 3.2em; letter-spacing: 10px; font-weight: bold; color: var(--secondary); margin: 15px 0; text-transform: uppercase; }
+        .instruction { font-size: 1.2em; color: #1e293b; font-weight: bold; min-height: 1.5em; }
+        
+        #user-input { width: 200px; font-size: 2.5em; text-align: center; color: var(--primary); border: 3px solid var(--primary); }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.3em; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .btn:hover { filter: brightness(1.2); }
+        
+        .hidden { display: none; }
+        #feedback { font-weight: bold; height: 30px; margin: 10px; font-size: 1.4em; }
+        
+        @media print { .no-print { display: none; } #print-area { display: block !important; } }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="setup-screen" class="setup-box">
+        <div class="header">
+            <h1>CO QUYNH SPELL 🎤</h1>
+            <p style="color:#64748b;">Hành trình chinh phục Phonics từ A0 - B1</p>
+        </div>
+        <input type="text" id="std-name" placeholder="Nhập tên của con...">
+        <select id="topic-select">
+            <optgroup label="1. VOWELS (Nguyên âm)">
+                <option value="v_all">Tất cả nguyên âm (A, O, U, E, I)</option>
+            </optgroup>
+            <optgroup label="2. CONSONANT DIGRAPHS">
+                <option value="c_sh_ch">SH & CH (Ship, Chair...)</option>
+                <option value="th_voiced">TH Hữu thanh (That, This, Mother...)</option>
+                <option value="th_unvoiced">TH Vô thanh (Think, Math, Thin...)</option>
+            </optgroup>
+            <optgroup label="3. L & S BLENDS">
+                <option value="pl_cl">PL & CL (Plane, Cloud...)</option>
+                <option value="sm_sn">SM & SN (Smile, Snake...)</option>
+            </optgroup>
+            <optgroup label="4. ADVANCED (3-Letter Blends)">
+                <option value="spl_squ">SPL & SQU (Splash, Square...)</option>
+            </optgroup>
+        </select>
+        <button class="btn" onclick="startApp()">BẮT ĐẦU HỌC CÙNG CÔ QUỲNH 🚀</button>
+    </div>
+
+    <div id="study-screen" class="hidden">
+        <div style="display:flex; justify-content:space-between; font-weight:bold; color:#64748b; margin-bottom:10px;">
+            <span id="display-name"></span>
+            <span id="timer">⏱ 00:00</span>
+        </div>
+
+        <div class="sound-hub">
+            <button class="sound-btn" onclick="playSound('A')">A</button>
+            <button class="sound-btn" onclick="playSound('E')">E</button>
+            <button class="sound-btn" onclick="playSound('I')">I</button>
+            <button class="sound-btn" onclick="playSound('O')">O</button>
+            <button class="sound-btn" onclick="playSound('U')">U</button>
+            <button class="sound-btn" onclick="playSound('sh')">SH</button>
+            <button class="sound-btn" onclick="playSound('ch')">CH</button>
+            <button class="sound-btn" onclick="playSound('th')">TH</button>
+            <button class="sound-btn" onclick="playSound('S P L')">SPL</button>
+            <button class="sound-btn" onclick="playSound('S Q U')">SQU</button>
+        </div>
+
+        <div class="challenge-zone">
+            <div class="instruction" id="voice-msg">...</div>
+            <div class="hint-text" id="hint-display">_ _ _ ASH</div>
+            <div id="meaning-hint" style="color:#64748b; font-style: italic; font-size: 1.1em;"></div>
+        </div>
+
+        <div style="text-align: center;">
+            <input type="text" id="user-input" placeholder="?" autocomplete="off">
+            <div id="feedback"></div>
+            <button class="btn" onclick="check()">KIỂM TRA ✅</button>
+            <p onclick="render()" style="color:var(--primary); cursor:pointer; font-weight:bold; margin-top:15px; text-decoration: underline;">🔊 NGHE MÁY HỎI LẠI</p>
+        </div>
+    </div>
+
+    <div id="report-screen" class="hidden">
+        <div id="print-area">
+            <center>
+                <h2 style="color:var(--primary); margin:0;">CO QUYNH PHONICS SPELL</h2>
+                <p>BÁO CÁO TIẾN ĐỘ HỌC TẬP</p>
+            </center>
+            <p>Học sinh: <b id="r-name"></b> | Bài học: <b id="r-topic"></b></p>
+            <table border="1" style="width:100%; border-collapse: collapse; text-align: center;">
+                <thead><tr style="background:#f1f5f9;"><th>Từ vựng</th><th>Âm khuyết</th><th>Kết quả</th></tr></thead>
+                <tbody id="diary-body"></tbody>
+            </table>
+            <div style="margin-top:20px; padding:15px; background:#fff7ed; border-radius:10px; border: 1px solid #ffedd5;">
+                <b>Lời nhắn từ cô Quỳnh:</b>
+                <p id="r-comment"></p>
+            </div>
+        </div>
+        <button class="btn no-print" style="background:#059669;" onclick="window.print()">🖨 IN PHIẾU GỬI PHỤ HUYNH</button>
+        <button class="btn no-print" style="background:#64748b; margin-top:10px;" onclick="location.reload()">CHỌN BÀI KHÁC</button>
+    </div>
+</div>
+
+<script>
+const data = {
+    v_all: [{w:"apple",h:"_PPLE",a:"A",m:"Quả táo"},{w:"dog",h:"D_G",a:"O",m:"Con chó"},{w:"duck",h:"D_CK",a:"U",m:"Con vịt"},{w:"hen",h:"H_N",a:"E",m:"Con gà"},{w:"pig",h:"P_G",a:"I",m:"Con lợn"}],
+    c_sh_ch: [{w:"ship",h:"__IP",a:"SH",m:"Tàu thủy"},{w:"fish",h:"FI__",a:"SH",m:"Con cá"},{w:"chair",h:"__AIR",a:"CH",m:"Cái ghế"},{w:"chin",h:"__IN",a:"CH",m:"Cái cằm"}],
+    th_voiced: [{w:"that",h:"__AT",a:"TH",m:"Kia (Hữu thanh)"},{w:"this",h:"__IS",a:"TH",m:"Này (Hữu thanh)"},{w:"mother",h:"MO__ER",a:"TH",m:"Mẹ (Hữu thanh)"}],
+    th_unvoiced: [{w:"think",h:"__INK",a:"TH",m:"Suy nghĩ (Vô thanh)"},{w:"thank",h:"__ANK",a:"TH",m:"Cảm ơn (Vô thanh)"},{w:"math",h:"MA__",a:"TH",m:"Môn toán (Vô thanh)"}],
+    pl_cl: [{w:"plane",h:"__ANE",a:"PL",m:"Máy bay"},{w:"cloud",h:"__OUD",a:"CL",m:"Đám mây"},{w:"plate",h:"__ATE",a:"PL",m:"Cái đĩa"}],
+    sm_sn: [{w:"smile",h:"__ILE",a:"SM",m:"Nụ cười"},{w:"snake",h:"__AKE",a:"SN",m:"Con rắn"},{w:"snow",h:"__OW",a:"SN",m:"Tuyết rơi"}],
+    spl_squ: [{w:"splash",h:"___ASH",a:"SPL",m:"Bắn nước"},{w:"square",h:"___ARE",a:"SQU",m:"Hình vuông"},{w:"squid",h:"___ID",a:"SQU",m:"Con mực"}]
+};
+
+let activeQ = [], studentName = "", history = [], timerI, synth = window.speechSynthesis;
+
+function playSound(s) {
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(s);
+    u.lang = 'en-US'; u.rate = 0.5;
+    synth.speak(u);
+}
+
+function startApp() {
+    studentName = document.getElementById('std-name').value;
+    if(!studentName) return alert("Cô Quỳnh chưa biết tên con nè!");
+    let topic = document.getElementById('topic-select').value;
+    activeQ = [...data[topic]].sort(() => Math.random() - 0.5);
+    document.getElementById('setup-screen').classList.add('hidden');
+    document.getElementById('study-screen').classList.remove('hidden');
+    document.getElementById('display-name').innerText = "Học sinh: " + studentName;
+    
+    let s = 0;
+    timerI = setInterval(() => { s++; document.getElementById('timer').innerText = `⏱ ${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }, 1000);
+    render();
+}
+
+function render() {
+    if(activeQ.length === 0) return finish();
+    const item = activeQ[0];
+    document.getElementById('hint-display').innerText = item.h;
+    document.getElementById('meaning-hint').innerText = "Nghĩa: " + item.m;
+    document.getElementById('user-input').value = "";
+    document.getElementById('user-input').focus();
+    document.getElementById('feedback').innerText = "";
+    
+    synth.cancel();
+    const q = new SpeechSynthesisUtterance(`Can you find the sound ${item.a.split('').join(' ')} in this word?`);
+    q.lang = 'en-US'; q.rate = 0.8;
+    synth.speak(q);
+}
+
+function check() {
+    const val = document.getElementById('user-input').value.trim().toUpperCase();
+    const item = activeQ[0];
+    if(val === item.a) {
+        document.getElementById('feedback').innerText = "EXCELLENT! 🌟";
+        document.getElementById('feedback').style.color = "#059669";
+        history.push({w: item.w, a: item.a, st: "Đúng ✅"});
+        teach(item.w);
+    } else {
+        document.getElementById('feedback').innerText = "TRY AGAIN! ❌";
+        document.getElementById('feedback').style.color = "#dc2626";
+        playSound(item.a.split('').join(' '));
+    }
+}
+
+function teach(w) {
+    synth.cancel();
+    const u1 = new SpeechSynthesisUtterance(w);
+    const u2 = new SpeechSynthesisUtterance(w);
+    const u3 = new SpeechSynthesisUtterance(`Great job. ${w}`);
+    u2.rate = 0.4;
+    const run = (u, cb) => { u.lang = 'en-US'; u.onend = cb; synth.speak(u); };
+    run(u1, () => setTimeout(() => run(u2, () => setTimeout(() => run(u3, () => { activeQ.shift(); render(); }), 600)), 600));
+}
+
+function finish() {
+    clearInterval(timerI);
+    document.getElementById('study-screen').classList.add('hidden');
+    document.getElementById('report-screen').classList.remove('hidden');
+    document.getElementById('r-name').innerText = studentName;
+    document.getElementById('r-topic').innerText = document.getElementById('topic-select').options[document.getElementById('topic-select').selectedIndex].text;
+    
+    let h = "";
+    history.forEach(i => h += `<tr><td>${i.w.toUpperCase()}</td><td>${i.a}</td><td>${i.st}</td></tr>`);
+    document.getElementById('diary-body').innerHTML = h;
+    document.getElementById('r-comment').innerText = "Con đã hoàn thành rất tốt bài học âm hôm nay. Con hãy tiếp tục phát huy nhé!";
+}
+document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') check(); });
+</script>
+</body>
+</html>

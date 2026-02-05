@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ thống Đánh giá & Lộ trình English K12</title>
+    <style>
+        :root { --primary: #003087; --accent: #00a1e4; --success: #28a745; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; line-height: 1.5; }
+        #app-container { max-width: 850px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.1); }
+        
+        /* UI Components */
+        .screen { display: none; }
+        .active { display: block; }
+        .main-btn { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .main-btn:hover { background: var(--accent); }
+        
+        /* Question Area */
+        .q-text { font-size: 1.4rem; font-weight: bold; margin-bottom: 25px; color: #333; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-item { padding: 15px; border: 2px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .opt-item:hover { border-color: var(--primary); background: #f0f7ff; }
+
+        /* Roadmap Visual */
+        .roadmap-graphic { display: flex; justify-content: space-between; margin: 40px 0; background: #f8f9fa; padding: 20px; border-radius: 15px; position: relative; }
+        .node { text-align: center; flex: 1; position: relative; z-index: 1; }
+        .node-circle { width: 45px; height: 45px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: bold; color: white; }
+        .node.passed .node-circle { background: var(--success); }
+        .node.current .node-circle { background: var(--primary); transform: scale(1.2); box-shadow: 0 0 15px rgba(0,48,135,0.4); }
+        
+        /* Resource List */
+        .resource-box { border-left: 5px solid var(--accent); background: #eef9ff; padding: 20px; border-radius: 0 10px 10px 0; margin: 20px 0; }
+        .resource-category { font-weight: bold; color: var(--primary); margin-top: 10px; display: block; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; background: white; }
+            #app-container { width: 100%; box-shadow: none; padding: 10px; }
+            .roadmap-graphic { border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="start-screen" class="screen active">
+        <h1 style="text-align:center; color: var(--primary)">Hệ Thống Phân Loại Trình Độ K12</h1>
+        <p style="text-align:center">Dành cho học sinh từ 0 (A0) đến Tiền trung cấp (B1)</p>
+        <div style="margin: 30px 0;">
+            <label>Họ tên học sinh:</label>
+            <input type="text" id="stuName" style="width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;">
+            <label style="display:block; margin-top:15px;">Lớp hiện tại:</label>
+            <input type="text" id="stuClass" style="width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;">
+        </div>
+        <button class="main-btn" onclick="startTest()">Bắt Đầu Kiểm Tra Năng Lực</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div id="q-counter" style="color:var(--accent); font-weight:bold; margin-bottom:10px;"></div>
+        <div class="q-text" id="q-content"></div>
+        <div class="opt-grid" id="opt-container"></div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <div style="text-align:center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <h2 style="margin:0; color:var(--primary)">KẾT QUẢ ĐÁNH GIÁ NĂNG LỰC</h2>
+            <p id="print-info" style="font-size:1.1rem;"></p>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content: space-around; margin: 25px 0;">
+            <div style="text-align:center">
+                <span style="font-size:1.1rem">Điểm số</span>
+                <div style="font-size:3rem; font-weight:bold; color:var(--primary)" id="final-score"></div>
+            </div>
+            <div style="text-align:center; max-width: 60%;" id="level-summary"></div>
+        </div>
+
+        <h3>Lộ trình thăng tiến (Roadmap)</h3>
+        <div class="roadmap-graphic" id="roadmap-visual">
+            <div class="node" id="n-a0"><div class="node-circle">A0</div><div style="font-size:0.8rem">Bắt đầu</div></div>
+            <div class="node" id="n-a1"><div class="node-circle">A1</div><div style="font-size:0.8rem">Starter/Mover</div></div>
+            <div class="node" id="n-a2"><div class="node-circle">A2</div><div style="font-size:0.8rem">Flyer/KET</div></div>
+            <div class="node" id="n-b1"><div class="node-circle">B1</div><div style="font-size:0.8rem">PET</div></div>
+        </div>
+
+        <div class="resource-box">
+            <h4 style="margin-top:0">📚 Tài liệu học tập chuyên biệt cho con:</h4>
+            <div id="resource-list"></div>
+        </div>
+
+        <button class="main-btn no-print" onclick="window.print()">🖨️ In Báo Cáo & Danh Mục Tài Liệu</button>
+        <button class="main-btn no-print" style="background:#6c757d; margin-top:10px;" onclick="location.reload()">Kiểm tra lại</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "1. Which word is a color?", a: ["Circle", "Green", "Small", "Happy"], c: 1 },
+        { q: "2. I have two ____ (Tôi có 2 đôi mắt)", a: ["ears", "eyes", "noses", "hands"], c: 1 },
+        { q: "3. 'He is my mother's brother.' He is my...", a: ["Father", "Aunt", "Uncle", "Brother"], c: 2 },
+        { q: "4. Yesterday, I _____ to the park.", a: ["go", "goes", "went", "going"], c: 2 },
+        { q: "5. 'If it rains, I _____ at home.'", a: ["stay", "will stay", "stayed", "stays"], c: 1 },
+        { q: "6. Which is a 'Fruit'?", a: ["Carrot", "Potato", "Apple", "Onion"], c: 2 },
+        { q: "7. This book is _____ than that one.", a: ["interesting", "more interesting", "most interesting", "as interesting"], c: 1 },
+        { q: "8. I have been learning English _____ 3 years.", a: ["for", "since", "at", "in"], c: 0 },
+        { q: "9. How _____ do you go to the cinema?", a: ["much", "many", "often", "long"], c: 2 },
+        { q: "10. 'She ______ her homework yet.'", a: ["doesn't finish", "hasn't finished", "didn't finish", "won't finish"], c: 1 }
+    ];
+
+    let current = 0, score = 0;
+
+    function startTest() {
+        if(!document.getElementById('stuName').value) return alert("Nhập tên học sinh");
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        loadQ();
+    }
+
+    function loadQ() {
+        let q = questions[current];
+        document.getElementById('q-counter').innerText = `Câu hỏi ${current + 1} / 10`;
+        document.getElementById('q-content').innerText = q.q;
+        let html = "";
+        q.a.forEach((opt, i) => { html += `<div class="opt-item" onclick="ans(${i})">${opt}</div>`; });
+        document.getElementById('opt-container').innerHTML = html;
+    }
+
+    function ans(i) {
+        if(i === questions[current].c) score++;
+        current++;
+        if(current < questions.length) loadQ(); else finish();
+    }
+
+    function finish() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        document.getElementById('final-score').innerText = score + "/10";
+        document.getElementById('print-info').innerText = `Học sinh: ${document.getElementById('stuName').value} | Lớp: ${document.getElementById('stuClass').value}`;
+
+        let summary = "", res = "", nodeIds = [];
+
+        if(score <= 3) {
+            summary = "<b>Trình độ: A0 (Starter)</b><br>Bé cần tập trung vào từ vựng cơ bản và phát âm bảng chữ cái (Phonics).";
+            nodeIds = ["n-a0"];
+            res = `<span class="resource-category">Giáo trình:</span> Family and Friends 1, Phonics World 1-3.<br>
+                   <span class="resource-category">App/Web:</span> Monkey Stories, Raz-kids (Level AA-C).`;
+        } else if(score <= 6) {
+            summary = "<b>Trình độ: A1 (Elementary)</b><br>Đã có vốn từ, cần luyện tập ghép câu và kỹ năng nghe hiểu.";
+            nodeIds = ["n-a0", "n-a1"];
+            res = `<span class="resource-category">Giáo trình:</span> Family and Friends 2-3, Let's Go 3-4.<br>
+                   <span class="resource-category">Luyện thi:</span> Cambridge Starters / Movers.<br>
+                   <span class="resource-category">Đọc:</span> Oxford Bookworms (Stage 0).`;
+        } else if(score <= 8) {
+            summary = "<b>Trình độ: A2 (Pre-Intermediate)</b><br>Giao tiếp khá, cần học thêm các thì phức tạp và từ vựng học thuật.";
+            nodeIds = ["n-a0", "n-a1", "n-a2"];
+            res = `<span class="resource-category">Giáo trình:</span> Solutions Elementary, English File A1/A2.<br>
+                   <span class="resource-category">Luyện thi:</span> Cambridge Flyers / KET (A2 Key).<br>
+                   <span class="resource-category">Đọc:</span> Diary of a Wimpy Kid.`;
+        } else {
+            summary = "<b>Trình độ: B1 (Intermediate)</b><br>Nền tảng vững chắc. Cần luyện kỹ năng viết luận và thảo luận vấn đề xã hội.";
+            nodeIds = ["n-a0", "n-a1", "n-a2", "n-b1"];
+            res = `<span class="resource-category">Giáo trình:</span> Destination B1, Solutions Pre-Int.<br>
+                   <span class="resource-category">Luyện thi:</span> Cambridge PET (B1 Preliminary).<br>
+                   <span class="resource-category">Nghe:</span> TED-Ed, BBC Learning English.`;
+        }
+
+        document.getElementById('level-summary').innerHTML = summary;
+        document.getElementById('resource-list').innerHTML = res;
+        nodeIds.forEach((id, idx) => {
+            let el = document.getElementById(id);
+            if(idx === nodeIds.length - 1) el.className = "node current";
+            else el.className = "node passed";
+        });
+    }
+</script>
+</body>
+</html>

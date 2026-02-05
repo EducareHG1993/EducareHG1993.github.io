@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English Master A0-A1 - Ms. Quỳnh</title>
+    <style>
+        :root { --primary: #1e40af; --secondary: #c2185b; --dark: #0f172a; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; margin: 0; padding: 0; }
+        
+        /* Giao diện điều khiển */
+        .nav-bar { background: var(--dark); color: white; padding: 15px 25px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        select { padding: 10px; border-radius: 6px; border: 2px solid var(--primary); min-width: 300px; font-weight: bold; }
+        .btn-print { background: #059669; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-print:hover { background: #047857; }
+
+        /* Trang A4 */
+        .a4-page { width: 210mm; min-height: 297mm; padding: 12mm; margin: 10px auto; background: white; box-shadow: 0 0 15px rgba(0,0,0,0.1); box-sizing: border-box; position: relative; page-break-after: always; }
+        .header { border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+        h1 { font-size: 20px; color: var(--primary); margin: 0; text-transform: uppercase; }
+        
+        .section-title { background: #f1f5f9; border-left: 5px solid var(--primary); padding: 5px 10px; font-weight: bold; margin: 15px 0 8px; text-transform: uppercase; font-size: 13px; color: var(--dark); }
+        
+        /* Bảng tập viết */
+        .writing-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .writing-table td { border: 1px solid #e2e8f0; padding: 6px 10px; vertical-align: middle; }
+        .sample-word { font-weight: bold; font-size: 15px; width: 140px; color: #1e293b; background: #fafafa; }
+        .dots-line { border-bottom: 1px dotted #94a3b8; height: 26px; width: 100%; margin-top: 4px; }
+
+        /* Bài tập nối & điền từ */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin: 15px 40px; }
+        .match-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 15px; }
+        .dot { width: 7px; height: 7px; background: #334155; border-radius: 50%; }
+        .blank { display: inline-block; width: 90px; border-bottom: 1.5px solid #334155; margin: 0 5px; }
+        .fill-item { margin-bottom: 12px; font-size: 15px; }
+
+        /* Footer */
+        .footer-owner { border-top: 1px solid #eee; margin-top: 20px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #64748b; font-style: italic; }
+
+        @media print {
+            .nav-bar { display: none; }
+            body { background: white; }
+            .a4-page { margin: 0; width: 100%; box-shadow: none; padding: 10mm; border: none !important; }
+            @page { size: A4; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <strong>OWNER: MS. QUỲNH (0385737705)</strong>
+    <div>
+        <select id="lessonPicker" onchange="updateContent()"></select>
+        <button class="btn-print" onclick="window.print()">🖨️ IN GIÁO ÁN & BÀI TẬP</button>
+    </div>
+</div>
+
+<div id="print-area">
+    <div class="a4-page">
+        <div class="header">
+            <div>
+                <h1>TEACHER'S LESSON PLAN</h1>
+                <p style="margin:2px 0; font-size: 12px; color: #64748b;">Topic: <span id="lp-topic-sub"></span></p>
+            </div>
+            <div style="text-align: right; font-size: 12px; font-weight: bold;">Lesson <span class="lesson-id-display"></span></div>
+        </div>
+
+        <div class="section-title">I. OBJECTIVES</div>
+        <p style="font-size: 13px; margin: 5px 0;">Students will master 10 new words, focus on correct pronunciation (IPA), and apply words in sentences.</p>
+
+        <div class="section-title">II. VOCABULARY LIST</div>
+        <table style="width:100%; border-collapse: collapse; font

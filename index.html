@@ -1,120 +1,582 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Educare — Nền tảng học tập cho học sinh tiểu học: Toán, Tiếng Việt, Tiếng Anh" />
-  <title>Educare – Toán, Tiếng Việt, Tiếng Anh lớp 1–5</title>
-  <style>
-    :root{
-      --bg:#fff7ed; /* warm background */
-      --card:#ffffff;
-      --text:#1f2937;
-      --accent-1:#ff7ab6; /* pink */
-      --accent-2:#7ad3ff; /* sky */
-      --accent-3:#ffd166; /* yellow */
-      --accent-4:#8be76a; /* green */
-      --accent-5:#a78bfa; /* purple */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-      background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
-      display:flex;align-items:center;justify-content:center;padding:2rem;
-    }
-    .container{width:100%;max-width:980px;background:var(--card);padding:1.25rem;border-radius:18px;box-shadow:0 10px 30px rgba(15,23,42,0.08)}
-    header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-    .brand{display:flex;align-items:center;gap:.75rem}
-    .logo{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent-2),var(--accent-1));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:28px}
-    h1{margin:.2rem 0;font-size:1.6rem}
-    .tagline{color:#334155}
-    nav a{margin-left:0.75rem;color:var(--text);text-decoration:none;font-weight:700}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Toán Tiểu Học - Học theo phương pháp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+        }
+        header {
+            background: linear-gradient(90deg, #4f46e5, #3b82f6);
+            color: #fff;
+            padding: 18px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header h1 { margin: 0; font-size: 22px; }
+        header p { margin: 6px 0 0; opacity: 0.9; }
 
-    .intro{margin-top:0.75rem}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
-    .subject{padding:0.8rem;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.3));box-shadow:0 6px 18px rgba(2,6,23,0.06);text-align:center}
-    .subject h2{margin:0 0 .5rem;font-size:1.05rem}
-    .levels{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.9rem 1rem;border-radius:12px;font-weight:800;color:white;border:none;cursor:pointer;font-size:1rem;min-width:88px;min-height:56px;box-shadow:0 6px 12px rgba(15,23,42,0.08);
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn--pink{background:var(--accent-1)}
-    .btn--sky{background:var(--accent-2);color:#06283d}
-    .btn--yellow{background:var(--accent-3);color:#2b2b2b}
-    .btn--green{background:var(--accent-4);color:#0b3b10}
-    .btn--purple{background:var(--accent-5)}
+        main {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px 40px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            main { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+        }
+        @media (max-width: 600px) {
+            header h1 { font-size: 18px; }
+        }
 
-    .subject p{margin:.5rem 0 0;color:#475569}
-    footer{margin-top:1rem;text-align:center;color:#475569}
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+        .sidebar { position: sticky; top: 90px; height: fit-content; }
 
-    @media (max-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:520px){.grid{grid-template-columns:1fr}.btn{min-width:120px;width:48%;padding:.75rem;font-size:.95rem}}
-  </style>
+        .method-btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+        .method-btn.active { border-color: var(--primary); background: #eef2ff; }
+        .method-btn:hover { border-color: #c7d2fe; }
+        .level-group { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 16px; }
+        .level-btn {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+        .level-btn.active { border-color: var(--secondary); background: #ecfdf3; }
+        .level-btn:hover { border-color: #bbf7d0; }
+
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .tag.easy { background: #ecfdf3; color: #15803d; }
+        .tag.mid { background: #fff7ed; color: #b45309; }
+        .tag.hard { background: #fef2f2; color: #b91c1c; }
+
+        .steps li { margin: 6px 0; }
+        .example { background: #f9fafb; border: 1px dashed #e5e7eb; padding: 12px; border-radius: 12px; }
+        .example strong { color: var(--primary); }
+        .example .solution { margin-top: 8px; display: none; color: #111827; }
+        .example button { margin-top: 8px; }
+
+        .practice {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 14px;
+            background: #eef2ff;
+        }
+        .practice input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            width: 160px;
+            font-size: 16px;
+        }
+        .practice input:focus {
+            outline: none;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.35);
+        }
+        .practice-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover { filter: brightness(0.98); transform: translateY(-1px); }
+        .btn.secondary { background: #0ea5e9; }
+        .btn.ghost { background: #fff; color: var(--primary); border: 2px solid #c7d2fe; }
+        .feedback { margin-top: 10px; font-weight: 700; }
+        .score { font-size: 14px; color: var(--muted); margin-top: 6px; }
+        footer { text-align: center; color: var(--muted); padding: 10px 0 30px; }
+    </style>
 </head>
 <body>
-  <main class="container" role="main">
     <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">E</div>
-        <div>
-          <h1>Educare</h1>
-          <div class="tagline">Học vui — Học chắc cho học sinh tiểu học</div>
+        <div class="header-inner">
+            <h1>Ứng dụng Toán Tiểu Học – Học theo phương pháp</h1>
+            <p>Chọn phương pháp • Học theo cấp độ • Luyện tập có lời giải</p>
         </div>
-      </div>
-      <nav aria-label="Chuyển hướng">
-        <a href="#toan">Toán</a>
-        <a href="#tv">Tiếng Việt</a>
-        <a href="#ta">Tiếng Anh</a>
-      </nav>
     </header>
 
-    <section class="intro">
-      <p style="font-weight:700">Chọn môn và cấp học bằng các nút bên dưới. Các nút lớn, màu sắc dễ nhận biết — phù hợp cho trẻ em.</p>
-    </section>
+    <main>
+        <aside class="card sidebar">
+            <h3>Phương pháp</h3>
+            <div id="methodList"></div>
+            <div style="margin-top: 12px; font-size: 13px; color: var(--muted);">
+                Mỗi phương pháp có 3 cấp độ tăng dần từ cơ bản đến nâng cao.
+            </div>
+        </aside>
 
-    <section id="toan" class="grid" aria-labelledby="toan-title">
-      <div class="subject">
-        <h2 id="toan-title">📘 Toán tư duy</h2>
-        <p>Vui, logic, phát triển tư duy</p>
-        <div class="levels" style="margin-top:.6rem">
-          <a class="btn btn--pink" href="/toan/lop1.html">Lớp 1</a>
-          <a class="btn btn--sky" href="/toan/lop2.html">Lớp 2</a>
-          <a class="btn btn--yellow" href="/toan/lop3.html">Lớp 3</a>
-          <a class="btn btn--green" href="/toan/lop4.html">Lớp 4</a>
-          <a class="btn btn--purple" href="/toan/lop5.html">Lớp 5</a>
-        </div>
-      </div>
+        <section class="card" id="content">
+            <h2 id="methodTitle"></h2>
+            <p id="methodDesc"></p>
+            <div class="level-group" id="levelGroup"></div>
 
-      <div class="subject" id="tv">
-        <h2 id="tv-title">✍️ Tiếng Việt</h2>
-        <p>Rèn chữ, đọc hiểu, làm văn cơ bản</p>
-        <div class="levels" style="margin-top:.6rem">
-          <a class="btn btn--pink" href="/tv/lop1.html">Lớp 1</a>
-          <a class="btn btn--sky" href="/tv/lop2.html">Lớp 2</a>
-          <a class="btn btn--yellow" href="/tv/lop3.html">Lớp 1</a>
-          <a class="btn btn--green" href="/tv/lop4.html">Lớp 4</a>
-          <a class="btn btn--purple" href="/tv/lop5.html">Lớp 5</a>
-        </div>
-      </div>
+            <div id="levelContent"></div>
+            <div class="practice">
+                <div><strong>Luyện tập nhanh:</strong> <span id="practiceQuestion"></span></div>
+                <div class="practice-actions">
+                    <input id="practiceAnswer" type="number" inputmode="numeric" placeholder="Nhập đáp án" />
+                    <button class="btn" onclick="checkAnswer()">Kiểm tra</button>
+                    <button class="btn secondary" onclick="nextProblem()">Bài mới</button>
+                    <button class="btn ghost" onclick="resetScore()">Làm lại điểm</button>
+                </div>
+                <div class="feedback" id="practiceFeedback"></div>
+                <div class="score" id="practiceScore"></div>
+            </div>
+        </section>
+    </main>
 
-      <div class="subject" id="ta">
-        <h2 id="ta-title">🌍 Tiếng Anh</h2>
-        <p>Giao tiếp cơ bản, từ vựng, trò chơi</p>
-        <div class="levels" style="margin-top:.6rem">
-          <a class="btn btn--pink" href="/ta/lop1.html">Lớp 1</a>
-          <a class="btn btn--sky" href="/ta/lop2.html">Lớp 2</a>
-          <a class="btn btn--yellow" href="/ta/lop3.html">Lớp 3</a>
-          <a class="btn btn--green" href="/ta/lop4.html">Lớp 4</a>
-          <a class="btn btn--purple" href="/ta/lop5.html">Lớp 5</a>
-        </div>
-      </div>
-    </section>
+    <footer>Toán vui mỗi ngày • Học đúng phương pháp để làm bài nhanh và chính xác</footer>
 
-    <footer>
-      © EducareHG1993 — Liên hệ: <a href="mailto:youremail@example.com">youremail@example.com</a>
-    </footer>
-  </main>
+    <script>
+        const methods = {
+            addsub: {
+                name: "Cộng – trừ trong phạm vi 100",
+                desc: "Rèn kỹ năng tính nhẩm, đặt tính và tính theo thứ tự.",
+                levels: [
+                    {
+                        title: "Cấp độ 1: Cộng trừ không nhớ (0–20)",
+                        tag: "easy",
+                        steps: [
+                            "Xác định phép tính (cộng hay trừ).",
+                            "Tách số để tính nhanh (ví dụ 9+5 = 10+4).",
+                            "Kiểm tra lại kết quả bằng phép tính ngược."
+                        ],
+                        examples: [
+                            { q: "12 + 5 = ?", s: "12 + 5 = 17" },
+                            { q: "18 - 6 = ?", s: "18 - 6 = 12" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 2: Cộng trừ có nhớ (20–100)",
+                        tag: "mid",
+                        steps: [
+                            "Đặt tính theo cột (đơn vị, chục).",
+                            "Cộng/trừ hàng đơn vị, nhớ sang hàng chục nếu cần.",
+                            "Cộng/trừ hàng chục và ghi kết quả."
+                        ],
+                        examples: [
+                            { q: "47 + 38 = ?", s: "47 + 38 = 85" },
+                            { q: "92 - 57 = ?", s: "92 - 57 = 35" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 3: Biểu thức 2 phép tính",
+                        tag: "hard",
+                        steps: [
+                            "Xác định thứ tự thực hiện phép tính.",
+                            "Tính từng bước và ghi lại kết quả trung gian.",
+                            "Kiểm tra lại bằng ước lượng." 
+                        ],
+                        examples: [
+                            { q: "(25 + 17) - 9 = ?", s: "(25 + 17) - 9 = 42 - 9 = 33" },
+                            { q: "60 - (18 + 7) = ?", s: "60 - 25 = 35" }
+                        ]
+                    }
+                ]
+            },
+            muldiv: {
+                name: "Nhân – chia cơ bản",
+                desc: "Hiểu bảng cửu chương và chia đều.",
+                levels: [
+                    {
+                        title: "Cấp độ 1: Bảng nhân 2–5",
+                        tag: "easy",
+                        steps: [
+                            "Nhớ bảng nhân theo nhóm (2,3,4,5).",
+                            "Nhân là cộng lặp lại.",
+                            "Chia là phép ngược của nhân."
+                        ],
+                        examples: [
+                            { q: "4 × 3 = ?", s: "4 × 3 = 12" },
+                            { q: "15 ÷ 3 = ?", s: "15 ÷ 3 = 5" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 2: Bảng nhân 6–9",
+                        tag: "mid",
+                        steps: [
+                            "Ghi nhớ kết quả nhanh theo bảng nhân 6–9.",
+                            "Dùng phép nhân để kiểm tra phép chia.",
+                            "Rèn tốc độ bằng các bài ngắn."
+                        ],
+                        examples: [
+                            { q: "7 × 8 = ?", s: "7 × 8 = 56" },
+                            { q: "72 ÷ 9 = ?", s: "72 ÷ 9 = 8" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 3: Bài 2 bước",
+                        tag: "hard",
+                        steps: [
+                            "Tính phép nhân/chia trước.",
+                            "Cộng hoặc trừ kết quả trung gian.",
+                            "Đối chiếu bằng ước lượng." 
+                        ],
+                        examples: [
+                            { q: "6 × 7 + 8 = ?", s: "6 × 7 + 8 = 42 + 8 = 50" },
+                            { q: "54 ÷ 6 - 4 = ?", s: "54 ÷ 6 - 4 = 9 - 4 = 5" }
+                        ]
+                    }
+                ]
+            },
+            findx: {
+                name: "Tìm x (phương trình đơn giản)",
+                desc: "Biết cách chuyển vế và dùng phép tính ngược.",
+                levels: [
+                    {
+                        title: "Cấp độ 1: x + a = b",
+                        tag: "easy",
+                        steps: [
+                            "Muốn tìm x, lấy b trừ a.",
+                            "Thay x vào để kiểm tra." 
+                        ],
+                        examples: [
+                            { q: "x + 9 = 15", s: "x = 15 - 9 = 6" },
+                            { q: "x + 14 = 20", s: "x = 20 - 14 = 6" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 2: x - a = b",
+                        tag: "mid",
+                        steps: [
+                            "Muốn tìm x, lấy b cộng a.",
+                            "Kiểm tra bằng phép trừ." 
+                        ],
+                        examples: [
+                            { q: "x - 7 = 12", s: "x = 12 + 7 = 19" },
+                            { q: "x - 15 = 8", s: "x = 8 + 15 = 23" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 3: a × x = b",
+                        tag: "hard",
+                        steps: [
+                            "Muốn tìm x, lấy b chia a.",
+                            "Chọn b chia hết cho a.",
+                            "Kiểm tra lại bằng phép nhân." 
+                        ],
+                        examples: [
+                            { q: "6 × x = 42", s: "x = 42 ÷ 6 = 7" },
+                            { q: "9 × x = 81", s: "x = 81 ÷ 9 = 9" }
+                        ]
+                    }
+                ]
+            },
+            word: {
+                name: "Bài toán có lời văn",
+                desc: "Đọc hiểu, chọn phép tính đúng và trình bày lời giải rõ ràng.",
+                levels: [
+                    {
+                        title: "Cấp độ 1: Nhiều hơn/ít hơn",
+                        tag: "easy",
+                        steps: [
+                            "Gạch chân dữ kiện quan trọng.",
+                            "Xác định từ khóa: thêm, bớt, còn lại.",
+                            "Viết phép tính và đáp số." 
+                        ],
+                        examples: [
+                            { q: "Lan có 12 kẹo, cho bạn 5 kẹo. Lan còn bao nhiêu kẹo?", s: "12 - 5 = 7 (kẹo)" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 2: Chia đều",
+                        tag: "mid",
+                        steps: [
+                            "Xác định tổng số đồ vật.",
+                            "Xác định số phần chia.",
+                            "Dùng phép chia để tìm mỗi phần." 
+                        ],
+                        examples: [
+                            { q: "Có 24 chiếc bút chia đều cho 6 bạn. Mỗi bạn được mấy chiếc?", s: "24 ÷ 6 = 4 (bút)" }
+                        ]
+                    },
+                    {
+                        title: "Cấp độ 3: Bài 2 bước",
+                        tag: "hard",
+                        steps: [
+                            "Tìm bước 1 theo dữ kiện chính.",
+                            "Dùng kết quả bước 1 để làm bước 2.",
+                            "Trình bày đầy đủ phép tính và đáp số." 
+                        ],
+                        examples: [
+                            { q: "Mỗi quyển vở giá 8.000đ. Mua 6 quyển, đưa 60.000đ. Hỏi thừa bao nhiêu tiền?", s: "Tiền mua: 8.000 × 6 = 48.000đ. Thừa: 60.000 - 48.000 = 12.000đ" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let currentMethod = "addsub";
+        let currentLevel = 0;
+        let currentProblem = null;
+        let correctCount = 0;
+        let totalCount = 0;
+
+        function renderMethodList() {
+            const list = document.getElementById("methodList");
+            list.innerHTML = "";
+            Object.entries(methods).forEach(([id, m]) => {
+                const btn = document.createElement("button");
+                btn.className = "method-btn" + (id === currentMethod ? " active" : "");
+                btn.textContent = m.name;
+                btn.setAttribute("aria-pressed", id === currentMethod ? "true" : "false");
+                btn.onclick = () => { currentMethod = id; currentLevel = 0; renderContent(); };
+                list.appendChild(btn);
+            });
+        }
+
+        function renderContent() {
+            const method = methods[currentMethod];
+            document.getElementById("methodTitle").textContent = method.name;
+            document.getElementById("methodDesc").textContent = method.desc;
+
+            const levelGroup = document.getElementById("levelGroup");
+            levelGroup.innerHTML = "";
+            method.levels.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "level-btn" + (idx === currentLevel ? " active" : "");
+                btn.textContent = `Cấp độ ${idx + 1}`;
+                btn.setAttribute("aria-pressed", idx === currentLevel ? "true" : "false");
+                btn.onclick = () => { currentLevel = idx; renderContent(); };
+                levelGroup.appendChild(btn);
+            });
+
+            const lvl = method.levels[currentLevel];
+            const content = document.getElementById("levelContent");
+            content.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <h3 style="margin:0;">${lvl.title}</h3>
+                    <span class="tag ${lvl.tag}">${lvl.tag === 'easy' ? 'Dễ' : lvl.tag === 'mid' ? 'Trung bình' : 'Khó'}</span>
+                </div>
+                <h4>Các bước giải:</h4>
+                <ol class="steps">${lvl.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+                <h4>Ví dụ mẫu:</h4>
+                ${lvl.examples.map((ex, i) => `
+                    <div class="example" style="margin-bottom:10px;">
+                        <div><strong>Bài ${i + 1}:</strong> ${ex.q}</div>
+                        <button class="btn ghost" onclick="toggleSolution(this)">Xem lời giải</button>
+                        <div class="solution">${ex.s}</div>
+                    </div>
+                `).join("")}
+            `;
+
+            nextProblem();
+        }
+
+        function toggleSolution(btn) {
+            const solution = btn.parentElement.querySelector(".solution");
+            const show = solution.style.display !== "block";
+            solution.style.display = show ? "block" : "none";
+            btn.textContent = show ? "Ẩn lời giải" : "Xem lời giải";
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem(methodId, levelIdx) {
+            if (methodId === "addsub") {
+                if (levelIdx === 0) {
+                    const a = randomInt(1, 20);
+                    const b = randomInt(1, 20);
+                    if (Math.random() > 0.5) return { q: `${a} + ${b} = ?`, a: a + b };
+                    const bigger = Math.max(a, b);
+                    const smaller = Math.min(a, b);
+                    return { q: `${bigger} - ${smaller} = ?`, a: bigger - smaller };
+                }
+                if (levelIdx === 1) {
+                    const a = randomInt(20, 99);
+                    const b = randomInt(10, 80);
+                    if (Math.random() > 0.5) return { q: `${a} + ${b} = ?`, a: a + b };
+                    const bigger = Math.max(a, b);
+                    const smaller = Math.min(a, b);
+                    return { q: `${bigger} - ${smaller} = ?`, a: bigger - smaller };
+                }
+                const a = randomInt(10, 50);
+                const b = randomInt(5, 30);
+                if (Math.random() > 0.5) {
+                    const c = randomInt(2, 20);
+                    return { q: `(${a} + ${b}) - ${c} = ?`, a: a + b - c };
+                }
+                const c2 = randomInt(2, b);
+                return { q: `${a} + (${b} - ${c2}) = ?`, a: a + (b - c2) };
+            }
+
+            if (methodId === "muldiv") {
+                if (levelIdx === 0) {
+                    const a = randomInt(2, 5);
+                    const b = randomInt(2, 10);
+                    if (Math.random() > 0.5) return { q: `${a} × ${b} = ?`, a: a * b };
+                    const prod = a * b;
+                    return { q: `${prod} ÷ ${a} = ?`, a: b };
+                }
+                if (levelIdx === 1) {
+                    const a = randomInt(6, 9);
+                    const b = randomInt(2, 10);
+                    if (Math.random() > 0.5) return { q: `${a} × ${b} = ?`, a: a * b };
+                    const prod = a * b;
+                    return { q: `${prod} ÷ ${b} = ?`, a: a };
+                }
+                const a = randomInt(4, 9);
+                const b = randomInt(3, 9);
+                const c = randomInt(2, 15);
+                if (Math.random() > 0.5) return { q: `${a} × ${b} + ${c} = ?`, a: a * b + c };
+                const prod = a * b;
+                const c2 = randomInt(1, b);
+                return { q: `${prod} ÷ ${a} - ${c2} = ?`, a: b - c2 };
+            }
+
+            if (methodId === "findx") {
+                if (levelIdx === 0) {
+                    const a = randomInt(3, 20);
+                    const x = randomInt(2, 20);
+                    const b = a + x;
+                    return { q: `x + ${a} = ${b}. x = ?`, a: x };
+                }
+                if (levelIdx === 1) {
+                    const a = randomInt(3, 20);
+                    const x = randomInt(5, 30);
+                    const b = x - a;
+                    return { q: `x - ${a} = ${b}. x = ?`, a: x };
+                }
+                const a = randomInt(2, 9);
+                const x = randomInt(2, 12);
+                const b = a * x;
+                return { q: `${a} × x = ${b}. x = ?`, a: x };
+            }
+
+            if (methodId === "word") {
+                if (levelIdx === 0) {
+                    const total = randomInt(10, 30);
+                    const given = randomInt(1, 9);
+                    return {
+                        q: `Nam có ${total} viên bi, cho bạn ${given} viên. Nam còn bao nhiêu viên bi?`,
+                        a: total - given
+                    };
+                }
+                if (levelIdx === 1) {
+                    const total = randomInt(18, 48);
+                    const parts = randomInt(3, 8);
+                    const each = total - (total % parts);
+                    return {
+                        q: `Có ${each} chiếc kẹo chia đều cho ${parts} bạn. Mỗi bạn được mấy chiếc?`,
+                        a: each / parts
+                    };
+                }
+                const price = randomInt(4, 9) * 1000;
+                const qty = randomInt(4, 9);
+                const paid = price * qty + randomInt(2, 9) * 1000;
+                return {
+                    q: `Mỗi quyển vở giá ${price}đ. Mua ${qty} quyển, đưa ${paid}đ. Hỏi thừa bao nhiêu tiền?`,
+                    a: paid - price * qty
+                };
+            }
+        }
+
+        function nextProblem() {
+            currentProblem = generateProblem(currentMethod, currentLevel);
+            document.getElementById("practiceQuestion").textContent = currentProblem.q;
+            document.getElementById("practiceAnswer").value = "";
+            document.getElementById("practiceFeedback").textContent = "";
+            updateScore();
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById("practiceAnswer").value.trim();
+            if (input === "") {
+                document.getElementById("practiceFeedback").textContent = "Bạn chưa nhập đáp án.";
+                document.getElementById("practiceFeedback").style.color = "#b45309";
+                return;
+            }
+            const answer = Number(input);
+            totalCount++;
+            if (answer === currentProblem.a) {
+                correctCount++;
+                document.getElementById("practiceFeedback").textContent = "✅ Chính xác!";
+                document.getElementById("practiceFeedback").style.color = "#15803d";
+            } else {
+                document.getElementById("practiceFeedback").textContent = `❌ Chưa đúng. Đáp án đúng: ${currentProblem.a}`;
+                document.getElementById("practiceFeedback").style.color = "#b91c1c";
+            }
+            updateScore();
+        }
+
+        function updateScore() {
+            const percent = totalCount === 0 ? 0 : Math.round((correctCount / totalCount) * 100);
+            document.getElementById("practiceScore").textContent = `Đúng: ${correctCount}/${totalCount} • ${percent}%`;
+        }
+
+        function resetScore() {
+            correctCount = 0;
+            totalCount = 0;
+            updateScore();
+            document.getElementById("practiceFeedback").textContent = "";
+        }
+
+        renderMethodList();
+        renderContent();
+
+        document.getElementById("practiceAnswer").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkAnswer();
+        });
+    </script>
 </body>
 </html>

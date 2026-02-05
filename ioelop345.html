@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>IOE Speed Test - 200 Questions</title>
+    <style>
+        :root { --ioe-blue: #004a99; --ioe-orange: #ff6600; --bg: #fdfdfd; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eee; display: flex; justify-content: center; padding-top: 20px; }
+        #app { background: white; width: 95%; max-width: 800px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); overflow: hidden; position: relative; }
+        
+        /* Header & Stats */
+        .header { background: var(--ioe-blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .timer { font-size: 24px; font-weight: bold; color: #ffeb3b; }
+        .progress-text { font-size: 18px; }
+        
+        /* Quiz Area */
+        .content { padding: 40px; min-height: 300px; display: none; }
+        .active { display: block; }
+        .question { font-size: 22px; font-weight: bold; margin-bottom: 30px; line-height: 1.4; color: #333; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-opt { padding: 20px; border: 2px solid #ddd; border-radius: 10px; font-size: 18px; cursor: pointer; background: #fff; transition: 0.2s; text-align: left; }
+        .btn-opt:hover { border-color: var(--ioe-blue); background: #eef6ff; }
+        
+        /* Start & Result Screen */
+        .screen-full { text-align: center; padding: 50px; }
+        .main-btn { padding: 20px 50px; font-size: 20px; font-weight: bold; color: white; background: var(--ioe-orange); border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,102,0,0.3); }
+        .main-btn:hover { transform: scale(1.05); }
+
+        /* Report Table for Print */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="header">
+        <div class="progress-text">Câu hỏi: <span id="current-num">0</span>/<span id="total-num">200</span></div>
+        <div class="timer" id="timer">30:00</div>
+        <div class="score">Điểm: <span id="score">0</span></div>
+    </div>
+
+    <div id="start-screen" class="screen-full active">
+        <h1>CHINH PHỤC 200 CÂU IOE</h1>
+        <p style="color: #666;">Thử thách: Trả lời 200 câu trong vòng 30 phút.</p>
+        <p>Chọn khối lớp của con:</p>
+        <select id="grade-select" style="padding: 10px; font-size: 16px; margin-bottom: 20px;">
+            <option value="3">Khối Lớp 3</option>
+            <option value="4">Khối Lớp 4</option>
+            <option value="5">Khối Lớp 5</option>
+        </select><br>
+        <button class="main-btn" onclick="startTest()">BẮT ĐẦU THI</button>
+    </div>
+
+    <div id="quiz-screen" class="content">
+        <div class="question" id="q-text">Đang tải câu hỏi...</div>
+        <div class="options" id="opt-container"></div>
+    </div>
+
+    <div id="result-screen" class="screen-full">
+        <h2 style="color: var(--ioe-blue);">KẾT THÚC VÒNG THI</h2>
+        <div style="font-size: 40px; font-weight: bold; margin: 20px 0;" id="res-score"></div>
+        <p id="res-comment"></p>
+        
+        <div id="roadmap-print" style="text-align: left; background: #f9f9f9; padding: 20px; border-radius: 10px;">
+            <h3>Lộ trình ôn luyện IOE tiếp theo:</h3>
+            <ul id="roadmap-list"></ul>
+        </div>
+
+        <div class="no-print">
+            <button class="main-btn" onclick="window.print()" style="background: #28a745; margin-top: 20px;">IN BÁO CÁO KẾT QUẢ</button>
+            <button class="main-btn" onclick="location.reload()" style="background: #6c757d; margin-top: 20px;">THI LẠI</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ngân hàng câu hỏi mẫu (Trong thực tế bạn có thể thêm đủ 200 câu)
+    // Hệ thống sẽ tự nhân bản để đủ 200 câu thi thử nếu data thiếu
+    const rawData = [
+        {q: "What's the weather like? - It's ______.", a: ["sunny", "sun", "sunnies", "sunshine"], c: 0},
+        {q: "How ______ is she? - She is nine years old.", a: ["old", "many", "much", "often"], c: 0},
+        {q: "Choose the odd one out:", a: ["Father", "Mother", "Teacher", "Brother"], c: 2},
+        {q: "Arrange: like / I / monkeys / .", a: ["I like monkeys.", "I monkeys like.", "Monkeys I like.", "I like monkey."], c: 0},
+        {q: "Where ______ you from?", a: ["is", "am", "are", "be"], c: 2},
+        {q: "I go to school ______ 7 o'clock.", a: ["on", "in", "at", "to"], c: 2},
+        {q: "She ______ a beautiful doll.", a: ["has", "have", "is", "having"], c: 0},
+        {q: "Can you swim? - No, I ______.", a: ["can", "do", "can't", "don't"], c: 2},
+        {q: "My mother is a ______. She works in a hospital.", a: ["teacher", "doctor", "farmer", "driver"], c: 1},
+        {q: "______ is your birthday?", a: ["When", "What", "Where", "Who"], c: 0}
+    ];
+
+    const TOTAL_QUESTIONS = 200;
+    const TOTAL_TIME_SECONDS = 1800; // 30 phút
+    let quizData = [];
+    let currentIdx = 0;
+    let score = 0;
+    let timerSeconds = TOTAL_TIME_SECONDS;
+    let interval;
+    let isFinished = false;
+
+    function startTest() {
+        // Reset dữ liệu cho lượt thi mới
+        quizData = [];
+        currentIdx = 0;
+        score = 0;
+        timerSeconds = TOTAL_TIME_SECONDS;
+        isFinished = false;
+        document.getElementById('score').innerText = score;
+        document.getElementById('timer').innerText = "30:00";
+        document.getElementById('total-num').innerText = TOTAL_QUESTIONS;
+
+        // Tạo đủ số câu từ bộ mẫu (xáo trộn mỗi vòng)
+        while (quizData.length < TOTAL_QUESTIONS) {
+            const shuffled = [...rawData].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length && quizData.length < TOTAL_QUESTIONS; i++) {
+                quizData.push(shuffled[i]);
+            }
+        }
+
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        
+        loadQuestion();
+        clearInterval(interval);
+        interval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        if (isFinished) return;
+        let m = Math.floor(timerSeconds / 60);
+        let s = timerSeconds % 60;
+        document.getElementById('timer').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        timerSeconds--;
+        if(timerSeconds < 0) finish();
+    }
+
+    function loadQuestion() {
+        if(isFinished) return;
+        if(currentIdx >= TOTAL_QUESTIONS) return finish();
+        
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = quizData[currentIdx];
+        document.getElementById('q-text').innerText = q.q;
+        
+        const container = document.getElementById('opt-container');
+        container.innerHTML = "";
+        
+        q.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = "btn-opt";
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (isFinished) return;
+                container.querySelectorAll('button').forEach(b => b.disabled = true);
+                if(i === q.c) score += 10;
+                document.getElementById('score').innerText = score;
+                currentIdx++;
+                loadQuestion(); // Tải câu tiếp theo ngay lập tức (phản xạ nhanh)
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function finish() {
+        if (isFinished) return;
+        isFinished = true;
+        clearInterval(interval);
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        document.getElementById('timer').innerText = "00:00";
+        
+        const finalScore = score;
+        document.getElementById('res-score').innerText = finalScore + " ĐIỂM";
+        
+        let comment = "";
+        let roadmap = "";
+        
+        if(finalScore >= 1800) {
+            comment = "Trình độ: **Siêu sao IOE**. Tốc độ phản xạ và kiến thức cực tốt.";
+            roadmap = "<li>Luyện đề thi cấp Tỉnh/Thành phố.</li><li>Tập trung vào các câu hỏi ngữ pháp nâng cao và thành ngữ.</li>";
+        } else if(finalScore >= 1200) {
+            comment = "Trình độ: **Tiềm năng**. Kiến thức vững nhưng cần cải thiện tốc độ.";
+            roadmap = "<li>Luyện các bài gõ từ nhanh (Fill-in-the-blanks).</li><li>Ôn tập kỹ các thì quá khứ đơn và tương lai đơn.</li>";
+        } else {
+            comment = "Trình độ: **Cần cố gắng**. Con cần học thêm từ vựng và luyện phản xạ gõ phím.";
+            roadmap = "<li>Học thuộc bảng động từ bất quy tắc.</li><li>Luyện nghe qua các vòng tự luyện IOE mỗi ngày.</li>";
+        }
+        
+        document.getElementById('res-comment').innerHTML = comment;
+        document.getElementById('roadmap-list').innerHTML = roadmap;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>CO QUYNH GRAMMAR SPELL - A2 SERIES</title>
+    <style>
+        :root { --primary: #2563eb; --secondary: #db2777; --success: #059669; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        #app-container { background: white; width: 100%; max-width: 800px; min-height: 90vh; padding: 30px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border-top: 15px solid var(--primary); }
+        
+        /* Menu Bài học */
+        .lesson-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .lesson-card { background: white; border: 2px solid #e2e8f0; padding: 20px; border-radius: 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .lesson-card:hover { border-color: var(--primary); transform: translateY(-5px); background: #eff6ff; }
+        .lesson-card b { color: var(--primary); font-size: 1.1em; display: block; margin-bottom: 5px; }
+        .lesson-card span { font-size: 0.85em; color: #64748b; }
+
+        /* Vùng học tập */
+        .study-area { text-align: center; animation: fadeIn 0.5s; }
+        .question-card { background: #f1f5f9; padding: 40px; border-radius: 25px; border: 3px dashed #cbd5e1; margin: 25px 0; }
+        .sentence { font-size: 1.8em; line-height: 1.6; color: #1e293b; margin-bottom: 15px; }
+        .blank { color: var(--secondary); font-weight: bold; border-bottom: 4px solid var(--secondary); padding: 0 10px; }
+        
+        .options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px; }
+        .opt-btn { padding: 15px 30px; background: white; border: 2px solid #e2e8f0; border-radius: 15px; cursor: pointer; font-size: 1.2em; font-weight: bold; transition: 0.2s; min-width: 150px; }
+        .opt-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        .btn-back { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin-top: 20px; }
+        .hidden { display: none; }
+        #feedback { font-weight: bold; height: 35px; margin: 15px 0; font-size: 1.4em; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="menu-screen">
+        <div style="text-align: center;">
+            <h1 style="color:var(--primary); margin:0;">CO QUYNH GRAMMAR A2 ✍️</h1>
+            <p style="color:#64748b;">Hệ thống 10 bài tập ngữ pháp chuyên sâu</p>
+            <input type="text" id="std-name" placeholder="Tên học sinh..." style="width: 80%; padding: 15px; border-radius: 12px; border: 2px solid #ddd; margin: 20px 0; font-size: 16px;">
+        </div>
+        <div class="lesson-grid" id="lesson-list"></div>
+    </div>
+
+    <div id="study-screen" class="hidden study-area">
+        <div style="display:flex; justify-content:space-between; color:#64748b; font-weight:bold;">
+            <span id="lesson-title-display"></span>
+            <span id="progress-display">0/0</span>
+        </div>
+        <div class="question-card">
+            <div id="q-text" class="sentence"></div>
+            <div id="q-m" style="color:#64748b; font-style: italic; font-size: 1.1em;"></div>
+        </div>
+        <div id="options-box" class="options"></div>
+        <div id="feedback"></div>
+        <button class="btn-back" onclick="location.reload()">⬅ Quay lại danh sách bài</button>
+    </div>
+</div>
+
+<script>
+const syllabus = [
+    { t: "Bài 1", n: "Present Simple (+)", d: [
+        {q: "He _____ (play) the guitar well.", a: "plays", o: ["play", "plays"], m: "Anh ấy chơi đàn guitar giỏi."},
+        {q: "We _____ (eat) lunch at 12.", a: "eat", o: ["eat", "eats"], m: "Chúng tôi ăn trưa lúc 12 giờ."}
+    ]},
+    { t: "Bài 2", n: "Present Simple (-)", d: [
+        {q: "I _____ (not/like) spiders.", a: "don't like", o: ["don't like", "doesn't like"], m: "Con không thích nhện."},
+        {q: "She _____ (not/have) a car.", a: "doesn't have", o: ["don't have", "doesn't have"], m: "Cô ấy không có xe hơi."}
+    ]},
+    { t: "Bài 3", n: "Past Simple (-ed)", d: [
+        {q: "They _____ (visit) London last year.", a: "visited", o: ["visited", "visit"], m: "Họ đã thăm London năm ngoái."},
+        {q: "I _____ (clean) my room yesterday.", a: "cleaned", o: ["clean", "cleaned"], m: "Con đã dọn phòng hôm qua."}
+    ]},
+    { t: "Bài 4", n: "Past Irregular", d: [
+        {q: "She _____ (go) to bed at 10 PM.", a: "went", o: ["go", "went"], m: "Cô ấy đã đi ngủ lúc 10 giờ tối."},
+        {q: "He _____ (give) me a gift.", a: "gave", o: ["give", "gave"], m: "Chú ấy đã tặng con một món quà."}
+    ]},
+    { t: "Bài 5", n: "Future Simple", d: [
+        {q: "I _____ (be) a doctor in the future.", a: "will be", o: ["am", "will be"], m: "Con sẽ trở thành bác sĩ trong tương lai."},
+        {q: "It _____ (be) sunny tomorrow.", a: "will be", o: ["is", "will be"], m: "Ngày mai trời sẽ nắng."}
+    ]},
+    { t: "Bài 6", n: "Comparative", d: [
+        {q: "A plane is _____ than a car.", a: "faster", o: ["fast", "faster"], m: "Máy bay thì nhanh hơn ô tô."},
+        {q: "This book is _____ than that one.", a: "better", o: ["good", "better"], m: "Quyển sách này tốt hơn quyển kia."}
+    ]},
+    { t: "Bài 7", n: "Superlative", d: [
+        {q: "He is the _____ student in class.", a: "tallest", o: ["tall", "tallest"], m: "Cậu ấy là học sinh cao nhất lớp."},
+        {q: "Russia is the _____ country.", a: "biggest", o: ["big", "biggest"], m: "Nga là quốc gia lớn nhất."}
+    ]},
+    { t: "Bài 8", n: "Present Cont.", d: [
+        {q: "They _____ (watch) TV now.", a: "are watching", o: ["is watching", "are watching"], m: "Họ đang xem TV bây giờ."},
+        {q: "Listen! The bird _____ (sing).", a: "is singing", o: ["is singing", "are singing"], m: "Nghe kìa! Con chim đang hót."}
+    ]},
+    { t: "Bài 9", n: "Prepositions", d: [
+        {q: "We play games _____ Sunday.", a: "on", o: ["in", "on"], m: "Chúng tôi chơi trò chơi vào Chủ nhật."},
+        {q: "I sleep _____ night.", a: "at", o: ["at", "on"], m: "Con ngủ vào ban đêm."}
+    ]},
+    { t: "Bài 10", n: "Modal Verbs", d: [
+        {q: "I _____ (can) swim when I was 4.", a: "could", o: ["can", "could"], m: "Con đã có thể bơi khi con 4 tuổi."},
+        {q: "_____ I come in, please?", a: "May", o: ["May", "Do"], m: "Con có thể vào nhà được không ạ?"}
+    ]}
+];
+
+let currentQuestions = [], currentIndex = 0, synth = window.speechSynthesis;
+
+const menu = document.getElementById('lesson-list');
+syllabus.forEach((les, idx) => {
+    const card = document.createElement('div');
+    card.className = 'lesson-card';
+    card.innerHTML = `<b>${les.t}</b><span>${les.n}</span>`;
+    card.onclick = () => startLesson(idx);
+    menu.appendChild(card);
+});
+
+function startLesson(idx) {
+    const name = document.getElementById('std-name').value;
+    if(!name) return alert("Cô Quỳnh chưa biết tên con nè!");
+    currentQuestions = [...syllabus[idx].d].sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    document.getElementById('lesson-title-display').innerText = syllabus[idx].n;
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('study-screen').classList.remove('hidden');
+    render();
+}
+
+function render() {
+    if(currentIndex >= currentQuestions.length) {
+        alert("Tuyệt vời! Con đã hoàn thành bài học.");
+        return location.reload();
+    }
+    const item = currentQuestions[currentIndex];
+    document.getElementById('q-text').innerHTML = item.q.replace("_____", "<span class='blank'>_____</span>");
+    document.getElementById('q-m').innerText = "Nghĩa: " + item.m;
+    document.getElementById('progress-display').innerText = `${currentIndex + 1}/${currentQuestions.length}`;
+    document.getElementById('feedback').innerText = "";
+    
+    const box = document.getElementById('options-box');
+    box.innerHTML = "";
+    item.o.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => check(opt);
+        box.appendChild(btn);
+    });
+}
+
+function check(userAns) {
+    const item = currentQuestions[currentIndex];
+    const fb = document.getElementById('feedback');
+    if(userAns === item.a) {
+        fb.innerText = "CHÍNH XÁC! 🌟"; fb.style.color = "var(--success)";
+        speak(item.q.replace("_____", item.a));
+        currentIndex++;
+        setTimeout(render, 2000);
+    } else {
+        fb.innerText = "THỬ LẠI XEM NÀO! ❌"; fb.style.color = "var(--secondary)";
+        speak("Try again");
+    }
+}
+
+function speak(txt) {
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'en-US'; u.rate = 0.8;
+    synth.speak(u);
+}
+</script>
+</body>
+</html>

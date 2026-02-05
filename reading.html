@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>CO QUYNH READING STARS - RAZ LEVEL A2</title>
+    <style>
+        :root { --primary: #2563eb; --secondary: #10b981; --accent: #f59e0b; --bg: #f8fafc; }
+        body { font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        #app-container { background: white; width: 100%; max-width: 850px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; border: 4px solid #e2e8f0; }
+        
+        /* Header */
+        .app-header { background: var(--primary); color: white; padding: 20px; text-align: center; position: relative; }
+        .app-header h1 { margin: 0; font-size: 1.8em; text-transform: uppercase; letter-spacing: 2px; }
+        .app-header p { margin: 5px 0 0; opacity: 0.9; }
+
+        /* Library */
+        .library { padding: 30px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .book-item { background: white; border: 3px solid #f1f5f9; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .book-item:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1); }
+        .book-icon { font-size: 3.5em; display: block; margin-bottom: 10px; }
+
+        /* Reader Area */
+        .reader-zone { padding: 40px; text-align: center; }
+        .timer-badge { background: #fee2e2; color: #ef4444; padding: 8px 15px; border-radius: 50px; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+        .story-content { font-size: 1.8em; line-height: 1.8; color: #1e293b; margin: 30px 0; background: #fffcf0; padding: 30px; border-radius: 20px; border: 2px solid #fef3c7; }
+        
+        /* Buttons */
+        .btn-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn { padding: 15px 30px; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: 0.2s; color: white; }
+        .btn-listen { background: var(--accent); }
+        .btn-quiz { background: var(--primary); }
+        .btn-back { background: #64748b; margin-top: 20px; }
+
+        /* Quiz Area */
+        .quiz-zone { padding: 40px; }
+        .option-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.1em; text-align: left; cursor: pointer; background: white; }
+        .option-btn:hover { background: #f1f5f9; border-color: var(--primary); }
+
+        .report-card { background: #f0fdf4; border: 3px solid var(--secondary); border-radius: 20px; padding: 30px; text-align: center; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="app-header">
+        <h1>CO QUYNH READING STARS ⭐</h1>
+        <p id="sub-header">Học tập chăm chỉ - Thành công rực rỡ</p>
+    </div>
+
+    <div id="library-screen" class="library"></div>
+
+    <div id="reading-screen" class="reader-zone hidden">
+        <div class="timer-badge">⏱ Thời gian đọc: <span id="timer-val">00:00</span></div>
+        <h2 id="story-title" style="color:var(--primary); font-size: 2em;"></h2>
+        <div id="story-text" class="story-content"></div>
+        <div class="btn-group">
+            <button class="btn btn-listen" onclick="listen()">🔊 Nghe máy đọc</button>
+            <button class="btn btn-quiz" onclick="startQuiz()">📝 Làm bài tập</button>
+        </div>
+        <button class="btn btn-back" onclick="goHome()">⬅ Quay lại thư viện</button>
+    </div>
+
+    <div id="quiz-screen" class="quiz-zone hidden">
+        <div id="quiz-header" style="display:flex; justify-content: space-between; font-weight:bold; margin-bottom: 20px;">
+            <span id="q-count">Câu hỏi 1/5</span>
+            <span style="color:var(--primary)">Học sinh: <span id="current-student"></span></span>
+        </div>
+        <div id="q-text" style="font-size: 1.5em; font-weight: bold; margin-bottom: 20px;"></div>
+        <div id="options-box"></div>
+    </div>
+
+    <div id="result-screen" class="quiz-zone hidden">
+        <div class="report-card">
+            <h2 style="color:var(--secondary)">KẾT QUẢ CỦA CON</h2>
+            <div style="font-size: 1.5em; margin: 20px 0;">
+                <p>Số câu đúng: <b id="final-score">0/5</b></p>
+                <p>Thời gian thực hiện: <b id="final-time">00:00</b></p>
+            </div>
+            <div id="teacher-comment" style="font-style: italic; color: #475569; padding: 15px; border-top: 1px solid #eee;"></div>
+            <button class="btn btn-quiz" onclick="goHome()" style="margin-top:20px;">Hoàn thành</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const books = [
+    { id: 1, title: "My Lovely Family", icon: "🏠", content: "I love my family very much. My father is a doctor. My mother is a teacher. I have a little sister. We like to play together at the park every Sunday.", 
+      quiz: [
+        {q: "What is the father's job?", a: "Doctor", o: ["Doctor", "Teacher"]},
+        {q: "Does the writer have a sister?", a: "Yes", o: ["Yes", "No"]},
+        {q: "Where do they play?", a: "At the park", o: ["At home", "At the park"]},
+        {q: "When do they go to the park?", a: "Sunday", o: ["Sunday", "Monday"]},
+        {q: "Is the sister big or little?", a: "Little", o: ["Big", "Little"]}
+      ]
+    },
+    { id: 2, title: "The Hungry Caterpillar", icon: "🐛", content: "A small caterpillar is very hungry. He eats an apple on Monday. He eats two pears on Tuesday. He eats a lot of food. Then he becomes a beautiful butterfly.",
+      quiz: [
+        {q: "Is the caterpillar hungry?", a: "Yes", o: ["Yes", "No"]},
+        {q: "What does he eat on Monday?", a: "An apple", o: ["An apple", "A pear"]},
+        {q: "How many pears does he eat?", a: "Two", o: ["One", "Two"]},
+        {q: "What does he become at the end?", a: "Butterfly", o: ["Butterfly", "Bee"]},
+        {q: "Is the butterfly beautiful?", a: "Yes", o: ["Yes", "No"]}
+      ]
+    }
+];
+
+// Tạo đủ 20 bài
+for(let i=3; i<=20; i++) {
+    books.push({ id: i, title: "Lesson " + i, icon: "📚", content: "This is a new story for you to read. Enjoy your learning time with Co Quynh!", quiz: [] });
+}
+
+let currentBook = null;
+let currentQIdx = 0;
+let score = 0;
+let seconds = 0;
+let timerInterval = null;
+let synth = window.speechSynthesis;
+let studentName = "";
+
+// Render Library
+const lib = document.getElementById('library-screen');
+books.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'book-item';
+    div.innerHTML = `<span class="book-icon">${b.icon}</span><b>${b.title}</b>`;
+    div.onclick = () => startReading(b);
+    lib.appendChild(div);
+});
+
+function startReading(book) {
+    if(!studentName) {
+        studentName = prompt("Cô Quỳnh chào con, con tên là gì nhỉ?");
+        if(!studentName) return;
+    }
+    currentBook = book;
+    document.getElementById('library-screen').classList.add('hidden');
+    document.getElementById('reading-screen').classList.remove('hidden');
+    document.getElementById('story-title').innerText = book.title;
+    document.getElementById('story-text').innerText = book.content;
+    document.getElementById('current-student').innerText = studentName;
+    
+    // Start Timer
+    seconds = 0;
+    document.getElementById('timer-val').innerText = "00:00";
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        seconds++;
+        let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        let s = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer-val').innerText = `${m}:${s}`;
+    }, 1000);
+}
+
+function listen() {
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(currentBook.content);
+    u.lang = 'en-US'; u.rate = 0.8;
+    synth.speak(u);
+}
+
+function startQuiz() {
+    if(currentBook.quiz.length === 0) return alert("Bài học này đang đợi cô Quỳnh cập nhật câu hỏi con nhé!");
+    currentQIdx = 0; score = 0;
+    document.getElementById('reading-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = currentBook.quiz[currentQIdx];
+    document.getElementById('q-count').innerText = `Câu hỏi ${currentQIdx + 1}/5`;
+    document.getElementById('q-text').innerText = q.q;
+    const box = document.getElementById('options-box');
+    box.innerHTML = "";
+    q.o.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            if(opt === q.a) score++;
+            currentQIdx++;
+            if(currentQIdx < 5) showQuestion(); else showResult();
+        };
+        box.appendChild(btn);
+    });
+}
+
+function showResult() {
+    clearInterval(timerInterval);
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('final-score').innerText = `${score}/5`;
+    document.getElementById('final-time').innerText = document.getElementById('timer-val').innerText;
+    
+    const comment = document.getElementById('teacher-comment');
+    if(score === 5) comment.innerText = "🌟 Cô Quỳnh khen con! Con đọc rất tốt và hiểu bài sâu sắc.";
+    else if(score >= 3) comment.innerText = "👍 Con làm tốt lắm! Lần sau hãy chú ý thời gian để đọc nhanh hơn nhé.";
+    else comment.innerText = "📚 Con cần đọc lại bài kỹ hơn một chút. Đừng lo, luyện tập sẽ giỏi hơn!";
+}
+
+function goHome() {
+    location.reload();
+}
+</script>
+</body>
+</html>

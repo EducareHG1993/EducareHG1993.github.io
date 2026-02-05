@@ -1,0 +1,92 @@
+:root {
+    --pink-deep: #ff5d8f;
+    --pink-soft: #ff85a1;
+    --pink-bg: #fff5f7;
+    --white: #ffffff;
+}
+
+body {
+    margin: 0;
+    font-family: 'Lexend', sans-serif;
+    background-color: var(--pink-bg);
+}
+
+/* Header */
+header {
+    background: var(--white);
+    padding: 10px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-area { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+.logo-area img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--pink-soft); }
+.logo-area h1 { color: var(--pink-deep); margin: 0; font-size: 24px; }
+
+/* Buttons */
+.btn-auth {
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+}
+.btn-login { background: white; color: var(--pink-deep); border: 2px solid var(--pink-deep); margin-right: 10px; }
+.btn-register { background: var(--pink-deep); color: white; }
+.btn-auth:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 93, 143, 0.3); }
+
+/* Poster */
+.banner-container { padding: 25px 8%; display: flex; justify-content: center; }
+.poster-clean { width: 100%; max-width: 1100px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+/* Game Cards */
+.content { padding: 30px 8%; text-align: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+.card {
+    background: white;
+    border-radius: 35px;
+    padding: 30px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: 0.4s;
+    cursor: pointer;
+}
+.card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(255, 133, 161, 0.2); }
+.card img { width: 160px; height: 160px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
+
+/* Popup Đăng nhập */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    width: 350px;
+    text-align: center;
+    position: relative;
+    animation: zoomIn 0.3s ease;
+}
+@keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.modal input {
+    width: 100%; padding: 12px; margin: 10px 0;
+    border-radius: 12px; border: 1px solid #ddd; outline: none; box-sizing: border-box;
+}
+.btn-submit {
+    width: 100%; padding: 12px; margin-top: 15px;
+    background: var(--pink-deep); color: white;
+    border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
+}
+.close-btn { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; color: #aaa; }

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHADOWING LAB - CO QUYNH</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --primary: #6366f1; --accent: #ff6b6b; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #fdfbfb; margin: 0; padding: 20px; }
+        .main-container { max-width: 800px; margin: auto; background: white; border-radius: 40px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 8px solid #f1f5f9; }
+        
+        /* Lộ trình ngày */
+        .timeline { display: flex; overflow-x: auto; gap: 15px; padding: 15px; background: #f8fafc; border-radius: 20px; margin-bottom: 25px; }
+        .day-step { min-width: 80px; padding: 10px; border-radius: 15px; background: white; border: 2px solid var(--primary); cursor: pointer; font-weight: bold; position: relative; }
+        .day-step.active { background: var(--primary); color: white; transform: scale(1.1); }
+        .day-step.done::after { content: '✅'; position: absolute; top: -5px; right: -5px; font-size: 12px; }
+
+        /* Vùng luyện tập */
+        .practice-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 40px; border-radius: 30px; margin: 20px 0; min-height: 200px; position: relative; }
+        #engDisplay { font-size: 38px; font-weight: 800; color: #1e293b; text-shadow: 1px 1px 0px white; margin-bottom: 15px; }
+        #vieDisplay { font-size: 20px; color: #475569; background: rgba(255,255,255,0.5); display: inline-block; padding: 5px 15px; border-radius: 10px; }
+
+        /* Biểu đồ & Điểm */
+        .score-box { display: none; margin: 20px 0; }
+        .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 8px solid var(--gold); display: inline-flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; background: white; color: var(--primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        canvas { width: 100%; height: 80px; border-radius: 15px; margin-top: 20px; }
+
+        .btn-group { display: flex; justify-content: center; gap: 20px; align-items: center; }
+        .btn-main { width: 80px; height: 80px; border-radius: 50%; border: none; cursor: pointer; font-size: 30px; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-listen { background: var(--primary); color: white; }
+        .btn-record { background: var(--accent); color: white; }
+        .recording { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: rotate(0); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } 100% { transform: rotate(0); } }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <h1 style="color: var(--primary); margin-bottom: 5px;">🌟 SHADOWING PRO 🌟</h1>
+    <p style="color: #64748b; margin-top: 0;">Lộ trình 15 ngày thông minh của Cô Quỳnh</p>
+
+    <div class="timeline" id="timeline"></div>
+
+    <div class="practice-card">
+        <div id="engDisplay">Ready to Speak?</div>
+        <div id="vieDisplay">Nhấn "Ngày 1" để bắt đầu luyện tập</div>
+        
+        <div class="score-box" id="scoreBox">
+            <div class="score-circle" id="scoreValue">95</div>
+            <p style="font-weight: bold; color: var(--primary); margin-top: 10px;">EXCELLENT!</p>
+        </div>
+        
+        <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-main btn-listen" onclick="playSample()">🔊</button>
+        <button class="btn-main btn-record" id="micBtn" onclick="toggleMic()">🎙️</button>
+        <button class="btn-main" style="background: #94a3b8; color: white;" onclick="nextStep()">➡️</button>
+    </div>
+
+    <div style="margin-top: 25px;">
+        <progress id="pBar" value="0" max="10" style="width: 80%; height: 20px;"></progress>
+        <p id="pText" style="font-size: 14px; font-weight: bold; color: #64748b;">Câu 0/10</p>
+    </div>
+</div>
+
+<script>
+    // DỮ LIỆU CÂU HỎI (Hệ thống sẽ tự trộn câu cũ vào câu mới)
+    const masterData = {
+        1: [
+            {en: "I am a student.", vi: "Con là một học sinh."},
+            {en: "I like English.", vi: "Con thích tiếng Anh."},
+            {en: "My teacher is kind.", vi: "Cô giáo của con rất tốt bụng."},
+            {en: "This is my book.", vi: "Đây là cuốn sách của con."},
+            {en: "I love my family.", vi: "Con yêu gia đình mình."},
+            {en: "The sun is hot.", vi: "Mặt trời thì nóng."},
+            {en: "It is a red apple.", vi: "Đó là một quả táo đỏ."},
+            {en: "Look at the cat.", vi: "Nhìn con mèo kìa."},
+            {en: "I can jump high.", vi: "Con có thể nhảy cao."},
+            {en: "Happy birthday!", vi: "Chúc mừng sinh nhật!"}
+        ],
+        2: [
+            {en: "Where is the ball?", vi: "Quả bóng ở đâu?"},
+            {en: "She is my friend.", vi: "Cô ấy là bạn của con."},
+            // Cô thêm các câu ngày 2 vào đây...
+        ]
+    };
+
+    let currentDay = 1;
+    let stepIndex = 0;
+    let audioCtx, analyser, dataArray, source, animationId;
+
+    // Khởi tạo Timeline 15 ngày
+    const tl = document.getElementById('timeline');
+    for(let d=1; d<=15; d++) {
+        const btn = document.createElement('div');
+        btn.className = `day-step ${d===1?'active':''}`;
+        btn.innerText = `Ngày ${d}`;
+        btn.onclick = () => selectDay(d, btn);
+        tl.appendChild(btn);
+    }
+
+    function selectDay(d, el) {
+        currentDay = d;
+        stepIndex = 0;
+        document.querySelectorAll('.day-step').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const data = masterData[currentDay] || masterData[1];
+        const q = data[stepIndex];
+        document.getElementById('engDisplay').innerText = q.en;
+        document.getElementById('vieDisplay').innerText = q.vi;
+        document.getElementById('scoreBox').style.display = 'none';
+        document.getElementById('pBar').value = stepIndex + 1;
+        document.getElementById('pText').innerText = `Câu ${stepIndex+1}/10`;
+    }
+
+    function playSample() {
+        const text = document.getElementById('engDisplay').innerText;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+    }
+
+    async function toggleMic() {
+        const btn = document.getElementById('micBtn');
+        const canvas = document.getElementById('waveCanvas');
+
+        if (btn.classList.contains('recording')) {
+            btn.classList.remove('recording');
+            cancelAnimationFrame(animationId);
+            showScore();
+        } else {
+            btn.classList.add('recording');
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+            drawWave();
+        }
+    }
+
+    function showScore() {
+        // Giả lập thuật toán chấm điểm dựa trên âm lượng/thời gian
+        const score = Math.floor(Math.random() * (100 - 80 + 1)) + 80;
+        const box = document.getElementById('scoreBox');
+        const val = document.getElementById('scoreValue');
+        box.style.display = 'block';
+        val.innerText = score;
+        if(score >= 90) confetti({particleCount: 50, origin: {y: 0.7}});
+    }
+
+    function nextStep() {
+        if(stepIndex < 9) {
+            stepIndex++;
+            loadQuestion();
+        } else {
+            alert("Tuyệt vời! Con đã hoàn thành bài học hôm nay!");
+            document.querySelector('.day-step.active').classList.add('done');
+        }
+    }
+
+    function drawWave() {
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+
+        function render() {
+            animationId = requestAnimationFrame(render);
+            analyser.getByteFrequencyData(dataArray);
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            let x = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                let barHeight = dataArray[i] / 2;
+                ctx.fillStyle = `rgb(99, 102, 241)`;
+                ctx.fillRect(x, canvas.height - barHeight, 2, barHeight);
+                x += 3;
+            }
+        }
+        render();
+    }
+</script>
+</body>
+</html>

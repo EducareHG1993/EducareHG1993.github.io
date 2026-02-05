@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS. QUYNH'S 150 VOCAB MASTER</title>
+    <style>
+        :root { --primary: #4f46e5; --success: #10b981; --error: #ef4444; --accent: #f59e0b; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
+        #app-container { background: white; width: 100%; max-width: 550px; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 10px solid var(--primary); text-align: center; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #475569; }
+        input[type="text"], select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1em; box-sizing: border-box; }
+        .progress-bar { width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; margin: 20px 0; }
+        #progress-fill { height: 100%; background: var(--success); width: 0%; transition: 0.5s; }
+        .sentence-box { background: #f1f5f9; padding: 25px; border-radius: 15px; border: 1px dashed #cbd5e1; margin: 20px 0; font-size: 1.3em; line-height: 1.5; min-height: 90px; display: flex; align-items: center; justify-content: center; }
+        .blank { color: var(--primary); font-weight: bold; border-bottom: 3px solid var(--primary); padding: 0 5px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1em; transition: 0.2s; box-shadow: 0 4px 0 #3730a3; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3730a3; }
+        #report-card { border: 4px double var(--primary); padding: 25px; border-radius: 15px; text-align: left; position: relative; }
+        .stamp { position: absolute; right: 10px; top: 10px; border: 3px solid var(--success); color: var(--success); padding: 5px; transform: rotate(15deg); font-weight: bold; border-radius: 5px; }
+        .hidden { display: none; }
+        #feedback { height: 35px; margin: 10px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="login-screen">
+        <h1 style="color: var(--primary); margin: 0;">MS. QUỲNH VOCAB</h1>
+        <p style="color: #64748b; margin-bottom: 25px;">Hành trình 150 từ vựng A1 → A2</p>
+        <div class="input-group"><label>Tên học sinh:</label><input type="text" id="student-name" placeholder="Họ và tên..."></div>
+        <div class="input-group"><label>Lớp:</label><input type="text" id="student-class" placeholder="Ví dụ: 4A1..."></div>
+        <div class="input-group"><label>Chọn bài học:</label><select id="day-select"></select></div>
+        <button class="btn" onclick="startApp()">BẮT ĐẦU HỌC 🚀</button>
+    </div>
+
+    <div id="study-screen" class="hidden">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; color: #64748b;">
+            <span id="header-info"></span>
+            <span id="timer" style="color: var(--accent);">⏱ 00:00</span>
+        </div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <button onclick="speakSentence()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:bold;">🔊 NGHE CÂU HỎI</button>
+        <div class="sentence-box" id="display-sentence"></div>
+        <input type="text" id="user-input" placeholder="Gõ từ còn thiếu..." autocomplete="off">
+        <div id="feedback"></div>
+        <button class="btn" onclick="checkAnswer()">KIỂM TRA</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <div id="report-card">
+            <div class="stamp">HOÀN THÀNH</div>
+            <h2 style="text-align: center; color: var(--primary); border-bottom: 2px solid #eee;">PHIẾU KẾT QUẢ</h2>
+            <p><strong>Học sinh:</strong> <span id="res-name"></span></p>
+            <p><strong>Lớp:</strong> <span id="res-class"></span></p>
+            <p><strong>Bài học:</strong> Ngày <span id="res-day"></span></p>
+            <p><strong>Thời gian:</strong> <span id="res-time"></span></p>
+            <p><strong>Ngày làm:</strong> <span id="res-date"></span></p>
+            <p><strong>Nhận xét:</strong> <span id="res-comment" style="color: var(--primary); font-weight: bold;"></span></p>
+        </div>
+        <button class="btn" style="margin-top: 20px; background: #64748b;" onclick="location.reload()">HỌC BÀI KHÁC</button>
+    </div>
+</div>
+
+<script>
+const vocabData = {
+    1: [{q: "I need to _____ for my English exam.", a: "prepare", h: "Chuẩn bị"}, {q: "This cake is very _____, thank you!", a: "delicious", h: "Ngon tuyệt"}, {q: "The weather is _____ for a picnic.", a: "perfect", h: "Hoàn hảo"}, {q: "Can you _____ me the salt, please?", a: "pass", h: "Đưa cho"}, {q: "She has a big _____ of stamps.", a: "collection", h: "Bộ sưu tập"}, {q: "It's _____ to wash your hands often.", a: "important", h: "Quan trọng"}, {q: "The library is a _____ place to study.", a: "quiet", h: "Yên tĩnh"}, {q: "He is a very _____ and kind man.", a: "gentle", h: "Hiền lành"}, {q: "I am _____ to see you again!", a: "glad", h: "Vui mừng"}, {q: "Be _____ when you cross the street.", a: "careful", h: "Cẩn thận"}],
+    2: [{q: "The teacher _____ the lesson clearly.", a: "explained", h: "Giải thích"}, {q: "I made a _____ to help my mom.", a: "promise", h: "Lời hứa"}, {q: "We must _____ our environment.", a: "protect", h: "Bảo vệ"}, {q: "It is _____ to bring an umbrella.", a: "necessary", h: "Cần thiết"}, {q: "I felt _____ when I saw the ghost.", a: "frightened", h: "Sợ hãi"}, {q: "She is the most _____ student in class.", a: "clever", h: "Thông minh"}, {q: "This puzzle is too _____ for me.", a: "difficult", h: "Khó"}, {q: "The stars are _____ brightly tonight.", a: "shining", h: "Tỏa sáng"}, {q: "I want to _____ the forest with you.", a: "explore", h: "Khám phá"}, {q: "My parents gave me a nice _____.", a: "present", h: "Món quà"}],
+    3: [{q: "Please _____ the window, it's cold.", a: "close", h: "Đóng"}, {q: "He _____ a new car last month.", a: "bought", h: "Đã mua"}, {q: "I _____ my keys in the office.", a: "forgot", h: "Đã quên"}, {q: "The baby is _____ on the sofa.", a: "sleeping", h: "Đang ngủ"}, {q: "Eat _____ food to stay healthy.", a: "healthy", h: "Lành mạnh"}, {q: "She is _____ about the party.", a: "excited", h: "Hào hứng"}, {q: "They built a new _____ over the river.", a: "bridge", h: "Cây cầu"}, {q: "I was _____ when I missed the bus.", a: "disappointed", h: "Thất vọng"}, {q: "The dog is _____ its tail.", a: "wagging", h: "Vẫy (đuôi)"}, {q: "My uncle is a _____ doctor.", a: "famous", h: "Nổi tiếng"}],
+    4: [{q: "I will _____ you at the zoo.", a: "meet", h: "Gặp mặt"}, {q: "Can you _____ the answer?", a: "guess", h: "Đoán"}, {q: "The lake is too _____ to swim.", a: "shallow", h: "Nông"}, {q: "He is very _____ of his new bike.", a: "proud", h: "Tự hào"}, {q: "Speak in a low _____, please.", a: "voice", h: "Giọng nói"}, {q: "The cat is in the _____.", a: "garden", h: "Khu vườn"}, {q: "I have _____ at 8 AM.", a: "breakfast", h: "Bữa sáng"}, {q: "Wait for a _____, please.", a: "moment", h: "Giây lát"}, {q: "The hill is very _____.", a: "steep", h: "Dốc"}, {q: "Don't _____ in the library.", a: "shout", h: "Hét lên"}],
+    5: [{q: "I love listening to _____.", a: "music", h: "Âm nhạc"}, {q: "The rose has a sweet _____.", a: "smell", h: "Mùi hương"}, {q: "He told a _____ story.", a: "funny", h: "Vui nhộn"}, {q: "She _____ her hair every day.", a: "brushes", h: "Chải"}, {q: "This soup is very _____.", a: "salty", h: "Mặn"}, {q: "Let's go _____ in the pool.", a: "swimming", h: "Bơi lội"}, {q: "I lost my _____ yesterday.", a: "wallet", h: "Ví tiền"}, {q: "The bird has red _____.", a: "feathers", h: "Lông vũ"}, {q: "I am very _____ now.", a: "hungry", h: "Đói"}, {q: "Turn off the _____ please.", a: "light", h: "Đèn"}],
+    6: [{q: "The cat is _____ the table.", a: "under", h: "Dưới"}, {q: "I love to _____ around the world.", a: "travel", h: "Du lịch"}, {q: "She is a _____ dancer.", a: "graceful", h: "Duyên dáng"}, {q: "This knife is very _____.", a: "sharp", h: "Sắc"}, {q: "I like _____ fruit.", a: "fresh", h: "Tươi"}, {q: "Who _____ the game?", a: "won", h: "Thắng"}, {q: "Can you _____ me a pen?", a: "lend", h: "Mượn"}, {q: "Your hands are _____.", a: "dirty", h: "Bẩn"}, {q: "I have a _____ for you.", a: "surprise", h: "Ngạc nhiên"}, {q: "The street is very _____.", a: "narrow", h: "Hẹp"}],
+    7: [{q: "The sun is very _____ today.", a: "bright", h: "Sáng"}, {q: "The box is too _____ to carry.", a: "heavy", h: "Nặng"}, {q: "The glass is _____.", a: "empty", h: "Trống"}, {q: "He is a _____ man.", a: "strong", h: "Khỏe"}, {q: "This task is very _____.", a: "simple", h: "Đơn giản"}, {q: "I like _____ houses.", a: "modern", h: "Hiện đại"}, {q: "A phone is very _____.", a: "useful", h: "Hữu ích"}, {q: "You should be _____.", a: "polite", h: "Lịch sự"}, {q: "She is an _____ girl.", a: "active", h: "Năng động"}, {q: "Tell me the _____ truth.", a: "honest", h: "Trung thực"}],
+    8: [{q: "I often _____ letters to my penpal.", a: "write", h: "Viết"}, {q: "She _____ a beautiful song.", a: "sang", h: "Hát"}, {q: "Can you _____ the door?", a: "lock", h: "Khóa"}, {q: "The car is very _____.", a: "expensive", h: "Đắt"}, {q: "He is a _____ boy.", a: "brave", h: "Dũng cảm"}, {q: "It is _____ outside.", a: "cloudy", h: "Nhiều mây"}, {q: "I am _____ for the lesson.", a: "ready", h: "Sẵn sàng"}, {q: "The floor is _____.", a: "slippery", h: "Trơn"}, {q: "I _____ a loud noise.", a: "heard", h: "Nghe thấy"}, {q: "She _____ her ring.", a: "lost", h: "Mất"}],
+    9: [{q: "My bedroom is very _____.", a: "messy", h: "Bừa bộn"}, {q: "He _____ the window.", a: "broke", h: "Làm vỡ"}, {q: "The water is _____.", a: "deep", h: "Sâu"}, {q: "She has _____ hair.", a: "curly", h: "Xoăn"}, {q: "I like to _____ mountains.", a: "climb", h: "Leo"}, {q: "The plane _____ at 6.", a: "arrives", h: "Đến nơi"}, {q: "He is very _____.", a: "lazy", h: "Lười"}, {q: "I _____ a ghost!", a: "saw", h: "Thấy"}, {q: "The soup is _____.", a: "hot", h: "Nóng"}, {q: "It's a _____ story.", a: "scary", h: "Đáng sợ"}],
+    10: [{q: "I am _____ of spiders.", a: "afraid", h: "Sợ"}, {q: "He _____ me a secret.", a: "told", h: "Kể"}, {q: "The baby is _____.", a: "crying", h: "Khóc"}, {q: "I need some _____.", a: "advice", h: "Lời khuyên"}, {q: "She is very _____.", a: "pretty", h: "Xinh"}, {q: "The box is _____.", a: "square", h: "Vuông"}, {q: "I _____ a new dress.", a: "chose", h: "Chọn"}, {q: "The tea is _____.", a: "bitter", h: "Đắng"}, {q: "He is a _____ student.", a: "bright", h: "Sáng dạ"}, {q: "It's a _____ day.", a: "lovely", h: "Đáng yêu"}],
+    11: [{q: "I _____ my bike to school.", a: "ride", h: "Cưỡi/Đi"}, {q: "The giant is _____.", a: "huge", h: "Khổng lồ"}, {q: "She _____ her keys.", a: "found", h: "Tìm thấy"}, {q: "The juice is _____.", a: "sour", h: "Chua"}, {q: "He is very _____.", a: "rich", h: "Giàu"}, {q: "I _____ a mistake.", a: "made", h: "Mắc"}, {q: "The movie was _____.", a: "boring", h: "Chán"}, {q: "She _____ at the joke.", a: "laughed", h: "Cười"}, {q: "I am _____ today.", a: "bored", h: "Buồn chán"}, {q: "The wind is _____.", a: "strong", h: "Mạnh"}],
+    12: [{q: "He _____ his car.", a: "washed", h: "Rửa"}, {q: "The pillow is _____.", a: "soft", h: "Mềm"}, {q: "I _____ the answer.", a: "know", h: "Biết"}, {q: "She is _____ of heights.", a: "scared", h: "Sợ"}, {q: "The bread is _____.", a: "stale", h: "Cũ/Hẻo"}, {q: "I _____ a gift.", a: "received", h: "Nhận"}, {q: "The sky is _____.", a: "clear", h: "Trong xanh"}, {q: "He _____ the wall.", a: "painted", h: "Sơn"}, {q: "It's a _____ movie.", a: "sad", h: "Buồn"}, {q: "She _____ a cake.", a: "baked", h: "Nướng"}],
+    13: [{q: "The road is _____.", a: "rough", h: "Gồ ghề"}, {q: "He _____ a doctor.", a: "became", h: "Trở thành"}, {q: "I _____ my tea.", a: "spilled", h: "Làm đổ"}, {q: "The coffee is _____.", a: "strong", h: "Đậm đặc"}, {q: "She is very _____.", a: "kind", h: "Tốt bụng"}, {q: "I _____ my room.", a: "cleaned", h: "Dọn dẹp"}, {q: "The light is _____.", a: "dim", h: "Mờ"}, {q: "He _____ his team.", a: "joined", h: "Gia nhập"}, {q: "It's a _____ house.", a: "large", h: "Rộng"}, {q: "She _____ her homework.", a: "finished", h: "Xong"}],
+    14: [{q: "The bag is _____.", a: "light", h: "Nhẹ"}, {q: "He _____ a hole.", a: "dug", h: "Đào"}, {q: "I _____ my dinner.", a: "cooked", h: "Nấu"}, {q: "The ice is _____.", a: "cold", h: "Lạnh"}, {q: "She is _____ now.", a: "angry", h: "Giận"}, {q: "I _____ the bus.", a: "caught", h: "Bắt (xe)"}, {q: "The sea is _____.", a: "calm", h: "Yên tĩnh"}, {q: "He _____ his name.", a: "spelled", h: "Đánh vần"}, {q: "It's a _____ tree.", a: "tall", h: "Cao"}, {q: "She _____ the bird.", a: "fed", h: "Cho ăn"}],
+    15: [{q: "The knife is _____.", a: "blunt", h: "Cùn"}, {q: "He _____ the truth.", a: "hid", h: "Giấu"}, {q: "I _____ the race.", a: "ran", h: "Chạy"}, {q: "The room is _____.", a: "bright", h: "Sáng"}, {q: "She is _____ today.", a: "happy", h: "Vui"}, {q: "I _____ a letter.", a: "sent", h: "Gửi"}, {q: "The water is _____.", a: "frozen", h: "Đông đá"}, {q: "He _____ a poem.", a: "wrote", h: "Viết"}, {q: "It's a _____ dog.", a: "small", h: "Nhỏ"}, {q: "She _____ her hand.", a: "raised", h: "Giơ"}]
+};
+
+let activeWords = [], totalQ = 10, startTime, timerInt, student = {};
+const synth = window.speechSynthesis;
+
+const sel = document.getElementById('day-select');
+for(let i=1; i<=15; i++) {
+    let o = document.createElement('option'); o.value = i; o.innerText = `Ngày ${i}: 10 câu A1-A2`;
+    sel.appendChild(o);
+}
+
+function speakSentence() {
+    synth.cancel();
+    const item = activeWords[0];
+    const u = new SpeechSynthesisUtterance(item.q.replace("_____", item.a));
+    u.lang = 'en-US'; u.rate = 0.8; synth.speak(u);
+}
+
+function startApp() {
+    const n = document.getElementById('student-name').value;
+    const c = document.getElementById('student-class').value;
+    if(!n || !c) return alert("Điền tên và lớp con nhé!");
+    student = { name: n, class: c, day: sel.value };
+    activeWords = [...vocabData[student.day]].sort(() => Math.random() - 0.5);
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('study-screen').classList.remove('hidden');
+    document.getElementById('header-info').innerText = `${n} - Lớp ${c}`;
+    startTime = new Date();
+    timerInt = setInterval(() => {
+        let diff = Math.floor((new Date() - startTime) / 1000);
+        document.getElementById('timer').innerText = `⏱ ${Math.floor(diff/60).toString().padStart(2,'0')}:${(diff%60).toString().padStart(2,'0')}`;
+    }, 1000);
+    render();
+}
+
+function render() {
+    if(activeWords.length === 0) return finish();
+    const itm = activeWords[0];
+    document.getElementById('display-sentence').innerHTML = itm.q.replace("_____", `<span class="blank">_______</span>`);
+    document.getElementById('feedback').innerText = `Gợi ý: ${itm.h}`;
+    document.getElementById('feedback').className = "";
+    document.getElementById('user-input').value = "";
+    document.getElementById('user-input').focus();
+    document.getElementById('progress-fill').style.width = `${((10-activeWords.length)/10)*100}%`;
+    setTimeout(speakSentence, 600);
+}
+
+function checkAnswer() {
+    const input = document.getElementById('user-input').value.trim().toLowerCase();
+    const ans = activeWords[0].a.toLowerCase();
+    if(input === ans) {
+        document.getElementById('feedback').innerText = "ĐÚNG RỒI! ✨";
+        document.getElementById('feedback').className = "success";
+        synth.speak(new SpeechSynthesisUtterance(ans));
+        setTimeout(() => { activeWords.shift(); render(); }, 1000);
+    } else {
+        document.getElementById('feedback').innerText = `SAI RỒI! Từ đó là: ${ans}`;
+        document.getElementById('feedback').className = "error";
+        const w = activeWords.shift(); activeWords.push(w);
+        setTimeout(render, 2500);
+    }
+}
+
+function finish() {
+    clearInterval(timerInt);
+    document.getElementById('study-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    document.getElementById('res-name').innerText = student.name;
+    document.getElementById('res-class').innerText = student.class;
+    document.getElementById('res-day').innerText = student.day;
+    document.getElementById('res-time').innerText = document.getElementById('timer').innerText.replace('⏱ ','');
+    document.getElementById('res-date').innerText = new Date().toLocaleDateString('vi-VN');
+    const sec = Math.floor((new Date() - startTime) / 1000);
+    document.getElementById('res-comment').innerText = sec < 80 ? "XUẤT SẮC! Cô Quỳnh rất tự hào về con! 🌟" : "HOÀN THÀNH! Con luyện tập thêm để nhanh hơn nhé!";
+}
+
+document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
+</script>
+</body>
+</html>
